@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIF Handoff — Dev Container Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0f11;
+    --bg2: #13151a;
+    --bg3: #1a1d24;
+    --border: #232730;
+    --border2: #2e3340;
+    --text: #e2e4ea;
+    --text2: #8b90a0;
+    --text3: #555b6e;
+    --green: #4ade80;
+    --green-dim: rgba(74,222,128,0.08);
+    --amber: #fbbf24;
+    --amber-dim: rgba(251,191,36,0.08);
+    --blue: #60a5fa;
+    --blue-dim: rgba(96,165,250,0.08);
+    --red: #f87171;
+    --purple: #a78bfa;
+    --purple-dim: rgba(167,139,250,0.08);
+    --violet: #8b5cf6;
+    --violet-dim: rgba(139,92,246,0.08);
+    --violet-glow: rgba(139,92,246,0.15);
+    --code-bg: #0a0b0d;
+    --radius: 8px;
+    --radius2: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0; opacity: 0.4;
+  }
+  .wrapper { position: relative; z-index: 1; display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+
+  /* SIDEBAR */
+  .sidebar { position: sticky; top: 0; height: 100vh; overflow-y: auto; border-right: 1px solid var(--border); background: var(--bg2); display: flex; flex-direction: column; }
+  .sidebar-header { padding: 28px 24px 20px; border-bottom: 1px solid var(--border); }
+  .logo { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .logo-icon { width: 32px; height: 32px; background: var(--violet-dim); border: 1px solid var(--violet); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 13px; color: var(--violet); letter-spacing: -0.5px; flex-shrink: 0; }
+  .logo-text { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; color: var(--text); letter-spacing: -0.3px; }
+  .logo-sub { font-size: 11px; color: var(--text3); letter-spacing: 0.5px; }
+  .sidebar-nav { padding: 16px 0; flex: 1; }
+  .nav-section { padding: 0 16px; margin-bottom: 20px; }
+  .nav-section-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); padding: 0 8px; margin-bottom: 6px; }
+  .nav-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 6px; color: var(--text2); text-decoration: none; font-size: 12.5px; transition: all 0.15s; cursor: pointer; border: none; background: none; width: 100%; text-align: left; }
+  .nav-item:hover { background: var(--bg3); color: var(--text); }
+  .nav-item.active { background: var(--violet-dim); color: var(--violet); border: 1px solid rgba(139,92,246,0.2); }
+  .nav-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border2); flex-shrink: 0; }
+  .nav-item.active .nav-dot { background: var(--violet); }
+  .nav-num { font-size: 10px; color: var(--text3); margin-left: auto; }
+  .sidebar-footer { padding: 16px 24px; border-top: 1px solid var(--border); }
+  .status-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--violet); background: var(--violet-dim); border: 1px solid rgba(139,92,246,0.2); border-radius: 20px; padding: 4px 10px; }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--violet); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  /* MAIN */
+  .main { padding: 0; max-width: 860px; }
+
+  /* HERO */
+  .hero { padding: 60px 56px 48px; border-bottom: 1px solid var(--border); position: relative; overflow: hidden; }
+  .hero::after { content: ''; position: absolute; top: -60px; right: -60px; width: 300px; height: 300px; background: radial-gradient(circle, var(--violet-glow) 0%, transparent 70%); pointer-events: none; }
+  .hero-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--violet); background: var(--violet-dim); border: 1px solid rgba(139,92,246,0.25); border-radius: 4px; padding: 3px 10px; margin-bottom: 20px; letter-spacing: 0.5px; }
+  .hero h1 { font-family: 'Syne', sans-serif; font-size: 38px; font-weight: 800; line-height: 1.15; letter-spacing: -1px; color: var(--text); margin-bottom: 16px; }
+  .hero h1 span { color: var(--violet); }
+  .hero-desc { font-size: 14px; color: var(--text2); max-width: 520px; line-height: 1.8; margin-bottom: 28px; }
+  .hero-meta { display: flex; gap: 24px; flex-wrap: wrap; }
+  .meta-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text3); }
+  .meta-item strong { color: var(--text2); }
+
+  /* IDE TABS */
+  .ide-tabs { padding: 20px 56px; border-bottom: 1px solid var(--border); background: var(--bg2); display: flex; gap: 8px; }
+  .ide-tab { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; border: 1px solid var(--border2); color: var(--text2); cursor: default; }
+  .ide-tab.vscode { background: rgba(0,122,204,0.1); border-color: #007acc; color: #007acc; }
+  .ide-tab.jetbrains { background: rgba(139,92,246,0.1); border-color: var(--violet); color: var(--violet); }
+  .ide-tab-icon { font-size: 16px; }
+
+  /* CONTENT */
+  .content { padding: 0 56px 80px; }
+  .section { padding-top: 52px; border-bottom: 1px solid var(--border); padding-bottom: 48px; animation: fadeUp 0.4s ease both; }
+  .section:last-child { border-bottom: none; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .section-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 28px; }
+  .section-num { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; color: var(--violet); background: var(--violet-dim); border: 1px solid rgba(139,92,246,0.2); border-radius: 4px; padding: 2px 8px; margin-top: 4px; flex-shrink: 0; letter-spacing: 0.5px; }
+  .section-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; line-height: 1.3; }
+  .section-desc { font-size: 13px; color: var(--text2); margin-top: 6px; line-height: 1.7; }
+
+  /* CALLOUT */
+  .callout { border-radius: var(--radius); padding: 14px 18px; margin-bottom: 20px; border-left: 3px solid; font-size: 13px; line-height: 1.7; }
+  .callout.info    { background: var(--blue-dim);   border-color: var(--blue);   color: var(--blue); }
+  .callout.success { background: var(--green-dim);  border-color: var(--green);  color: var(--green); }
+  .callout.warning { background: var(--amber-dim);  border-color: var(--amber);  color: var(--amber); }
+  .callout.violet  { background: var(--violet-dim); border-color: var(--violet); color: var(--violet); }
+  .callout strong { font-weight: 600; }
+  .callout span { color: var(--text2); }
+
+  /* CODE */
+  .code-block { background: var(--code-bg); border: 1px solid var(--border); border-radius: var(--radius); margin: 16px 0; overflow: hidden; }
+  .code-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid var(--border); background: var(--bg2); }
+  .code-lang { font-size: 11px; color: var(--text3); letter-spacing: 0.5px; text-transform: uppercase; }
+  .copy-btn { font-size: 11px; color: var(--text3); background: none; border: 1px solid var(--border2); border-radius: 4px; padding: 3px 10px; cursor: pointer; font-family: 'JetBrains Mono', monospace; transition: all 0.15s; }
+  .copy-btn:hover { color: var(--violet); border-color: var(--violet); }
+  .copy-btn.copied { color: var(--violet); border-color: var(--violet); background: var(--violet-dim); }
+  .code-body { padding: 18px 20px; overflow-x: auto; }
+  pre { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.8; color: var(--text); white-space: pre; }
+  .cm { color: var(--text3); }
+  .ck { color: var(--purple); }
+  .cv { color: var(--green); }
+  .cs { color: var(--amber); }
+  .ce { color: var(--red); }
+  .cb { color: var(--blue); }
+  .cv2 { color: var(--violet); }
+  .prompt { color: var(--violet); user-select: none; }
+
+  /* STEPS */
+  .steps { display: flex; flex-direction: column; gap: 0; }
+  .step { display: flex; gap: 20px; padding: 20px 0; border-bottom: 1px solid var(--border); }
+  .step:last-child { border-bottom: none; }
+  .step-indicator { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+  .step-circle { width: 32px; height: 32px; border-radius: 50%; background: var(--bg3); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--text2); font-family: 'Syne', sans-serif; flex-shrink: 0; }
+  .step.done .step-circle { background: var(--violet-dim); border-color: var(--violet); color: var(--violet); }
+  .step-line { width: 1px; flex: 1; background: var(--border); margin-top: 4px; }
+  .step:last-child .step-line { display: none; }
+  .step-content { flex: 1; padding-bottom: 8px; }
+  .step-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+  .step-body { font-size: 13px; color: var(--text2); line-height: 1.7; }
+
+  /* INLINE CODE */
+  code { font-family: 'JetBrains Mono', monospace; background: var(--bg3); border: 1px solid var(--border2); border-radius: 4px; padding: 1px 6px; font-size: 12px; color: var(--violet); }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; margin: 16px 0; border-radius: var(--radius); border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  thead { background: var(--bg2); border-bottom: 1px solid var(--border); }
+  th { padding: 10px 16px; text-align: left; font-size: 11px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text3); font-weight: 500; }
+  td { padding: 10px 16px; border-bottom: 1px solid var(--border); color: var(--text2); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--bg3); }
+  td:first-child { color: var(--violet); font-weight: 500; }
+  td code { color: var(--amber); }
+
+  /* CARDS */
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; }
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius2); padding: 18px; transition: border-color 0.15s; }
+  .card:hover { border-color: var(--border2); }
+  .card-icon { font-size: 20px; margin-bottom: 10px; }
+  .card-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .card-desc { font-size: 12px; color: var(--text3); line-height: 1.6; }
+
+  /* CHECKLIST */
+  .checklist { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; }
+  .check-item { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--text2); }
+  .check-icon { width: 18px; height: 18px; border-radius: 4px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; margin-top: 1px; }
+  .check-icon.ok   { background: var(--green-dim);  color: var(--green);  border: 1px solid rgba(74,222,128,0.3); }
+  .check-icon.warn { background: var(--amber-dim);  color: var(--amber);  border: 1px solid rgba(251,191,36,0.3); }
+  .check-icon.info { background: var(--violet-dim); color: var(--violet); border: 1px solid rgba(139,92,246,0.3); }
+
+  /* TAG */
+  .tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 4px; margin: 2px; }
+  .tag.green  { background: var(--green-dim);  color: var(--green);  border: 1px solid rgba(74,222,128,0.2); }
+  .tag.amber  { background: var(--amber-dim);  color: var(--amber);  border: 1px solid rgba(251,191,36,0.2); }
+  .tag.blue   { background: var(--blue-dim);   color: var(--blue);   border: 1px solid rgba(96,165,250,0.2); }
+  .tag.violet { background: var(--violet-dim); color: var(--violet); border: 1px solid rgba(139,92,246,0.2); }
+
+  /* IDE COMPARISON */
+  .ide-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+  .ide-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius2); overflow: hidden; }
+  .ide-card-header { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .ide-card-body { padding: 16px 18px; font-size: 12px; color: var(--text2); line-height: 1.7; }
+  .ide-vscode .ide-card-header { background: rgba(0,122,204,0.08); }
+  .ide-jb .ide-card-header { background: var(--violet-dim); }
+  .ide-card-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; }
+  .ide-vscode .ide-card-title { color: #007acc; }
+  .ide-jb .ide-card-title { color: var(--violet); }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  @media (max-width: 900px) {
+    .wrapper { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .hero { padding: 40px 28px 32px; }
+    .content { padding: 0 28px 60px; }
+    .cards, .ide-grid { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 28px; }
+    .ide-tabs { padding: 16px 28px; }
+  }
+
+  p { margin-bottom: 12px; }
+  p:last-child { margin-bottom: 0; }
+  ul { padding-left: 20px; color: var(--text2); font-size: 13px; }
+  ul li { margin-bottom: 6px; }
+  h3 { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 600; color: var(--text); margin: 20px 0 10px; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="logo">
+      <div class="logo-icon">AF</div>
+      <div>
+        <div class="logo-text">AIF Handoff</div>
+        <div class="logo-sub">// dev container guide</div>
+      </div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-label">Начало</div>
+      <a class="nav-item active" href="#what">
+        <span class="nav-dot"></span> Что такое Dev Container
+        <span class="nav-num">01</span>
+      </a>
+      <a class="nav-item" href="#prereq">
+        <span class="nav-dot"></span> Требования
+        <span class="nav-num">02</span>
+      </a>
+      <a class="nav-item" href="#clone">
+        <span class="nav-dot"></span> Клонирование
+        <span class="nav-num">03</span>
+      </a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">VS Code</div>
+      <a class="nav-item" href="#vscode-setup">
+        <span class="nav-dot"></span> Установка расширения
+        <span class="nav-num">04</span>
+      </a>
+      <a class="nav-item" href="#vscode-open">
+        <span class="nav-dot"></span> Открытие в контейнере
+        <span class="nav-num">05</span>
+      </a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">JetBrains</div>
+      <a class="nav-item" href="#jb-setup">
+        <span class="nav-dot"></span> Настройка
+        <span class="nav-num">06</span>
+      </a>
+      <a class="nav-item" href="#jb-open">
+        <span class="nav-dot"></span> Открытие в контейнере
+        <span class="nav-num">07</span>
+      </a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Настройка</div>
+      <a class="nav-item" href="#auth">
+        <span class="nav-dot"></span> Авторизация Claude
+        <span class="nav-num">08</span>
+      </a>
+      <a class="nav-item" href="#env">
+        <span class="nav-dot"></span> Конфигурация .env
+        <span class="nav-num">09</span>
+      </a>
+      <a class="nav-item" href="#launch">
+        <span class="nav-dot"></span> Запуск и проверка
+        <span class="nav-num">10</span>
+      </a>
+      <a class="nav-item" href="#troubleshoot">
+        <span class="nav-dot"></span> Устранение проблем
+        <span class="nav-num">11</span>
+      </a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="status-pill">
+      <span class="status-dot"></span>
+      VS Code · JetBrains
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">// dev container · vscode · jetbrains · isolated</div>
+    <h1>AIF Handoff<br><span>Dev Container</span> Guide</h1>
+    <p class="hero-desc">
+      Запуск AIF Handoff в изолированном Dev Container прямо из VS Code или JetBrains IDE. Node 22, все зависимости и проброшенные порты — предустановлены автоматически. Не нужно ничего устанавливать на хост.
+    </p>
+    <div class="hero-meta">
+      <div class="meta-item">🐳 <strong>Docker Desktop</strong></div>
+      <div class="meta-item">💙 <strong>VS Code</strong></div>
+      <div class="meta-item">🟣 <strong>JetBrains IDE</strong></div>
+      <div class="meta-item">🔑 <strong>Claude аккаунт</strong></div>
+    </div>
+  </div>
+
+  <!-- IDE TABS -->
+  <div class="ide-tabs">
+    <div class="ide-tab vscode"><span class="ide-tab-icon">💙</span> VS Code</div>
+    <div class="ide-tab jetbrains"><span class="ide-tab-icon">🟣</span> JetBrains (IntelliJ, WebStorm, PyCharm...)</div>
+  </div>
+
+  <div class="content">
+
+    <!-- 01 WHAT -->
+    <section class="section" id="what">
+      <div class="section-header">
+        <span class="section-num">01</span>
+        <div>
+          <div class="section-title">Что такое Dev Container</div>
+          <div class="section-desc">Изолированная среда разработки внутри Docker-контейнера, управляемая из IDE</div>
+        </div>
+      </div>
+
+      <div class="callout violet">
+        <strong>Принцип:</strong> <span>Dev Container — это Docker-контейнер со всем необходимым окружением (Node.js 22, зависимости, порты), которым управляет ваша IDE. Открываете проект — IDE предлагает переоткрыть его в контейнере.</span>
+      </div>
+
+      <div class="cards">
+        <div class="card">
+          <div class="card-icon">⚡</div>
+          <div class="card-title">Нет ручной настройки</div>
+          <div class="card-desc">Node.js 22, npm, все зависимости предустановлены автоматически при открытии контейнера.</div>
+        </div>
+        <div class="card">
+          <div class="card-icon">🔒</div>
+          <div class="card-title">Полная изоляция</div>
+          <div class="card-desc">Среда не конфликтует с другими проектами и системными зависимостями на хосте.</div>
+        </div>
+        <div class="card">
+          <div class="card-icon">🌐</div>
+          <div class="card-title">Порты пробрасываются</div>
+          <div class="card-desc">Порты 3009 (API) и 5180 (Web UI) автоматически пробрасываются на хост.</div>
+        </div>
+        <div class="card">
+          <div class="card-icon">💾</div>
+          <div class="card-title">Код остаётся на хосте</div>
+          <div class="card-desc">Файлы проекта монтируются из хоста — редактируете как обычно, изменения сразу видны.</div>
+        </div>
+      </div>
+
+      <p style="font-size:13px; color:var(--text2);">Конфигурация Dev Container находится в репозитории:</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">tree</span></div>
+        <div class="code-body"><pre><span class="cv">aif-handoff/</span>
+└── <span class="cv2">.devcontainer/</span>
+    └── <span class="cs">devcontainer.json</span>   <span class="cm"># конфигурация контейнера</span></pre></div>
+      </div>
+    </section>
+
+    <!-- 02 PREREQ -->
+    <section class="section" id="prereq">
+      <div class="section-header">
+        <span class="section-num">02</span>
+        <div>
+          <div class="section-title">Требования</div>
+          <div class="section-desc">Что нужно установить перед началом</div>
+        </div>
+      </div>
+
+      <div class="ide-grid">
+        <div class="ide-card ide-vscode">
+          <div class="ide-card-header">
+            <span style="font-size:20px;">💙</span>
+            <div class="ide-card-title">VS Code</div>
+          </div>
+          <div class="ide-card-body">
+            <ul>
+              <li>VS Code (последняя версия)</li>
+              <li>Расширение <strong>Dev Containers</strong> от Microsoft</li>
+              <li>Docker Desktop</li>
+              <li>Git</li>
+            </ul>
+          </div>
+        </div>
+        <div class="ide-card ide-jb">
+          <div class="ide-card-header">
+            <span style="font-size:20px;">🟣</span>
+            <div class="ide-card-title">JetBrains</div>
+          </div>
+          <div class="ide-card-body">
+            <ul>
+              <li>IntelliJ IDEA, WebStorm, PyCharm или другая JetBrains IDE</li>
+              <li>Плагин <strong>Dev Containers</strong></li>
+              <li>Docker Desktop</li>
+              <li>Git</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout warning">
+        <strong>Docker Desktop обязателен:</strong> <span>Dev Container работает поверх Docker. Убедитесь что Docker Desktop запущен перед открытием проекта в IDE.</span>
+      </div>
+    </section>
+
+    <!-- 03 CLONE -->
+    <section class="section" id="clone">
+      <div class="section-header">
+        <span class="section-num">03</span>
+        <div>
+          <div class="section-title">Клонирование репозитория</div>
+          <div class="section-desc">Получить исходный код на хост-машину</div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="prompt">$</span> git clone https://github.com/lee-to/aif-handoff.git
+<span class="prompt">$</span> cd aif-handoff</pre></div>
+      </div>
+
+      <div class="callout info">
+        <strong>Или клонировать прямо из IDE:</strong> <span>VS Code и JetBrains поддерживают клонирование через встроенный Git-клиент — <code>Git: Clone</code> в командной строке VS Code или <code>File → New → Project from VCS</code> в JetBrains.</span>
+      </div>
+    </section>
+
+    <!-- 04 VSCODE SETUP -->
+    <section class="section" id="vscode-setup">
+      <div class="section-header">
+        <span class="section-num">04</span>
+        <div>
+          <div class="section-title">VS Code — установка расширения</div>
+          <div class="section-desc">Установить Dev Containers extension от Microsoft</div>
+        </div>
+      </div>
+
+      <div class="steps">
+        <div class="step done">
+          <div class="step-indicator"><div class="step-circle">1</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Открыть панель расширений</div>
+            <div class="step-body">В VS Code нажмите <code>Ctrl+Shift+X</code> (или <code>Cmd+Shift+X</code> на macOS) для открытия Extensions.</div>
+          </div>
+        </div>
+        <div class="step done">
+          <div class="step-indicator"><div class="step-circle">2</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Найти и установить Dev Containers</div>
+            <div class="step-body">
+              Введите в поиске: <code>Dev Containers</code><br>
+              Установите расширение от <strong>Microsoft</strong> (ID: <code>ms-vscode-remote.remote-containers</code>)
+            </div>
+          </div>
+        </div>
+        <div class="step done">
+          <div class="step-indicator"><div class="step-circle">3</div></div>
+          <div class="step-content">
+            <div class="step-title">Убедиться что Docker Desktop запущен</div>
+            <div class="step-body">Dev Containers требует запущенный Docker. Иконка Docker в трее должна показывать "Docker Desktop is running".</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash — альтернативно через CLI</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="prompt">$</span> code --install-extension ms-vscode-remote.remote-containers</pre></div>
+      </div>
+    </section>
+
+    <!-- 05 VSCODE OPEN -->
+    <section class="section" id="vscode-open">
+      <div class="section-header">
+        <span class="section-num">05</span>
+        <div>
+          <div class="section-title">VS Code — открытие в контейнере</div>
+          <div class="section-desc">Два способа открыть проект в Dev Container</div>
+        </div>
+      </div>
+
+      <h3>Способ 1 — через уведомление (рекомендуется)</h3>
+      <div class="steps">
+        <div class="step done">
+          <div class="step-indicator"><div class="step-circle">1</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Открыть папку проекта</div>
+            <div class="step-body"><code>File → Open Folder</code> → выбрать папку <code>aif-handoff</code></div>
+          </div>
+        </div>
+        <div class="step done">
+          <div class="step-indicator"><div class="step-circle">2</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Принять предложение VS Code</div>
+            <div class="step-body">VS Code автоматически обнаружит <code>.devcontainer/devcontainer.json</code> и покажет уведомление в правом нижнем углу:<br><br>
+              <span style="color:var(--violet); background:var(--violet-dim); padding: 4px 10px; border-radius:4px; font-size:12px;">Reopen in Container</span>
+              <br><br>Нажмите эту кнопку.
+            </div>
+          </div>
+        </div>
+        <div class="step done">
+          <div class="step-indicator"><div class="step-circle">3</div></div>
+          <div class="step-content">
+            <div class="step-title">Дождаться сборки контейнера</div>
+            <div class="step-body">VS Code соберёт образ и запустит контейнер. При первом запуске это займёт несколько минут. Прогресс виден в уведомлении — нажмите <strong>"Show log"</strong> для деталей.</div>
+          </div>
+        </div>
+      </div>
+
+      <h3>Способ 2 — через Command Palette</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">vs code — command palette</span></div>
+        <div class="code-body"><pre><span class="cm"># Открыть Command Palette</span>
+<span class="cs">Ctrl+Shift+P</span>  <span class="cm">(или Cmd+Shift+P на macOS)</span>
+
+<span class="cm"># Ввести команду</span>
+<span class="cv2">Dev Containers: Reopen in Container</span></pre></div>
+      </div>
+
+      <div class="callout success">
+        <strong>После открытия:</strong> <span>В левом нижнем углу VS Code появится индикатор <code>Dev Container: aif-handoff</code> — это означает что вы работаете внутри контейнера. Терминал VS Code теперь работает внутри контейнера.</span>
+      </div>
+    </section>
+
+    <!-- 06 JB SETUP -->
+    <section class="section" id="jb-setup">
+      <div class="section-header">
+        <span class="section-num">06</span>
+        <div>
+          <div class="section-title">JetBrains — настройка</div>
+          <div class="section-desc">Установить плагин Dev Containers для JetBrains IDE</div>
+        </div>
+      </div>
+
+      <div class="steps">
+        <div class="step done">
+          <div class="step-indicator"><div class="step-circle">1</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Открыть настройки плагинов</div>
+            <div class="step-body">
+              <code>File → Settings → Plugins</code> (Windows/Linux)<br>
+              <code>IntelliJ IDEA → Preferences → Plugins</code> (macOS)
+            </div>
+          </div>
+        </div>
+        <div class="step done">
+          <div class="step-indicator"><div class="step-circle">2</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Найти и установить Dev Containers</div>
+            <div class="step-body">
+              На вкладке <strong>Marketplace</strong> найдите <code>Dev Containers</code> и нажмите <strong>Install</strong>.<br>
+              После установки перезапустите IDE.
+            </div>
+          </div>
+        </div>
+        <div class="step done">
+          <div class="step-indicator"><div class="step-circle">3</div></div>
+          <div class="step-content">
+            <div class="step-title">Настроить Docker в IDE</div>
+            <div class="step-body">
+              <code>Settings → Build, Execution, Deployment → Docker</code><br>
+              Нажмите <strong>+</strong> и выберите <strong>Docker Desktop</strong> (или Unix socket на Linux).
+              IDE должна показать <span class="tag green">Connection successful</span>.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 07 JB OPEN -->
+    <section class="section" id="jb-open">
+      <div class="section-header">
+        <span class="section-num">07</span>
+        <div>
+          <div class="section-title">JetBrains — открытие в контейнере</div>
+          <div class="section-desc">Открыть проект aif-handoff в Dev Container</div>
+        </div>
+      </div>
+
+      <div class="steps">
+        <div class="step done">
+          <div class="step-indicator"><div class="step-circle">1</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Открыть проект</div>
+            <div class="step-body"><code>File → Open</code> → выбрать папку <code>aif-handoff</code></div>
+          </div>
+        </div>
+        <div class="step done">
+          <div class="step-indicator"><div class="step-circle">2</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Принять предложение IDE</div>
+            <div class="step-body">JetBrains обнаружит <code>.devcontainer/devcontainer.json</code> и покажет уведомление:<br><br>
+              <span style="color:var(--violet); background:var(--violet-dim); padding: 4px 10px; border-radius:4px; font-size:12px;">Reopen in Dev Container</span>
+              <br><br>Нажмите эту кнопку.
+            </div>
+          </div>
+        </div>
+        <div class="step done">
+          <div class="step-indicator"><div class="step-circle">3</div></div>
+          <div class="step-content">
+            <div class="step-title">Дождаться запуска контейнера</div>
+            <div class="step-body">IDE соберёт и запустит контейнер. Прогресс отображается в нижней панели статуса. При первом запуске займёт несколько минут.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout info">
+        <strong>Альтернативно:</strong> <span>В JetBrains можно открыть Dev Container через <code>File → Remote Development → Dev Containers → Open Existing</code> и указать путь к папке с <code>.devcontainer</code>.</span>
+      </div>
+    </section>
+
+    <!-- 08 AUTH -->
+    <section class="section" id="auth">
+      <div class="section-header">
+        <span class="section-num">08</span>
+        <div>
+          <div class="section-title">Авторизация Claude</div>
+          <div class="section-desc">Настроить доступ к Claude внутри Dev Container</div>
+        </div>
+      </div>
+
+      <p style="font-size:13px; color:var(--text2); margin-bottom: 16px;">Два варианта — выберите один:</p>
+
+      <h3>Option A — API Key (рекомендуется для Dev Container)</h3>
+      <p style="font-size:13px; color:var(--text2);">Создайте <code>.env</code> из примера <strong>до</strong> открытия контейнера:</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="prompt">$</span> cp .env.example .env</pre></div>
+      </div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">.env</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="ck">ANTHROPIC_API_KEY</span>=<span class="cv">sk-ant-xxxxx</span></pre></div>
+      </div>
+
+      <h3>Option B — Claude подписка (OAuth внутри терминала)</h3>
+      <p style="font-size:13px; color:var(--text2);">Откройте терминал внутри контейнера (в VS Code — <code>Ctrl+`</code>, в JetBrains — вкладка Terminal) и выполните:</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash — терминал внутри контейнера</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="prompt">$</span> claude login</pre></div>
+      </div>
+
+      <div class="callout warning">
+        <strong>URL из терминала:</strong> <span>Скопируйте URL целиком без переносов строк и откройте в браузере на хосте. Переносы строк ломают OAuth с ошибкой <code>invalid code_challenge</code>.</span>
+      </div>
+    </section>
+
+    <!-- 09 ENV -->
+    <section class="section" id="env">
+      <div class="section-header">
+        <span class="section-num">09</span>
+        <div>
+          <div class="section-title">Конфигурация .env</div>
+          <div class="section-desc">Настройка переменных окружения для Dev Container</div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash — создать из примера</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="prompt">$</span> cp .env.example .env</pre></div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Переменная</th><th>По умолчанию</th><th>Описание</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>ANTHROPIC_API_KEY</td>
+              <td><span style="color:var(--text3)">—</span></td>
+              <td>Оставить пустым если используется <code>claude login</code></td>
+            </tr>
+            <tr>
+              <td>PORT</td>
+              <td><code>3009</code></td>
+              <td>Порт API — пробрасывается на хост автоматически</td>
+            </tr>
+            <tr>
+              <td>WEB_PORT</td>
+              <td><code>5180</code></td>
+              <td>Порт Web UI — пробрасывается на хост автоматически</td>
+            </tr>
+            <tr>
+              <td>AGENT_BYPASS_PERMISSIONS</td>
+              <td><code>true</code></td>
+              <td>Разрешить агенту выполнять команды</td>
+            </tr>
+            <tr>
+              <td>AGENT_USE_SUBAGENTS</td>
+              <td><code>true</code></td>
+              <td><code>false</code> для ускорения на слабых машинах</td>
+            </tr>
+            <tr>
+              <td>POLL_INTERVAL_MS</td>
+              <td><code>30000</code></td>
+              <td>Интервал опроса задач (мс)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 10 LAUNCH -->
+    <section class="section" id="launch">
+      <div class="section-header">
+        <span class="section-num">10</span>
+        <div>
+          <div class="section-title">Запуск и проверка</div>
+          <div class="section-desc">Запустить сервисы из терминала внутри контейнера</div>
+        </div>
+      </div>
+
+      <div class="callout violet">
+        <strong>Важно:</strong> <span>Все команды выполняются в терминале <strong>внутри контейнера</strong> (терминал IDE после открытия в Dev Container), не на хосте.</span>
+      </div>
+
+      <div class="steps">
+        <div class="step done">
+          <div class="step-indicator"><div class="step-circle">1</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Установить зависимости</div>
+            <div class="step-body">
+              <div class="code-block" style="margin:0;">
+                <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+                <div class="code-body"><pre><span class="prompt">$</span> npm install</pre></div>
+              </div>
+              <p style="margin-top:8px;">В Dev Container зависимости могут устанавливаться автоматически — проверьте лог запуска контейнера.</p>
+            </div>
+          </div>
+        </div>
+        <div class="step done">
+          <div class="step-indicator"><div class="step-circle">2</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Инициализировать базу данных</div>
+            <div class="step-body">
+              <div class="code-block" style="margin:0;">
+                <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+                <div class="code-body"><pre><span class="prompt">$</span> npm run init</pre></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step done">
+          <div class="step-indicator"><div class="step-circle">3</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Запустить все сервисы</div>
+            <div class="step-body">
+              <div class="code-block" style="margin:0;">
+                <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+                <div class="code-body"><pre><span class="prompt">$</span> npm run dev</pre></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step done">
+          <div class="step-indicator"><div class="step-circle">4</div></div>
+          <div class="step-content">
+            <div class="step-title">Открыть Web UI</div>
+            <div class="step-body">
+              Перейдите на <code>http://localhost:5180</code> в браузере на хосте — порт пробрасывается автоматически.<br><br>
+              VS Code также покажет уведомление с кнопкой <strong>"Open in Browser"</strong> при старте сервера.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout success">
+        <strong>Готово:</strong> <span>API на <code>:3009</code> · Web UI на <code>:5180</code> · Agent работает внутри контейнера. Создайте проект в UI и добавьте задачу в Backlog.</span>
+      </div>
+    </section>
+
+    <!-- 11 TROUBLESHOOT -->
+    <section class="section" id="troubleshoot">
+      <div class="section-header">
+        <span class="section-num">11</span>
+        <div>
+          <div class="section-title">Устранение проблем</div>
+          <div class="section-desc">Типичные проблемы Dev Container</div>
+        </div>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-indicator"><div class="step-circle">!</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">IDE не предлагает "Reopen in Container"</div>
+            <div class="step-body">
+              Убедитесь что расширение/плагин Dev Containers установлен и Docker Desktop запущен. В VS Code вызовите вручную:<br>
+              <code>Ctrl+Shift+P</code> → <code>Dev Containers: Reopen in Container</code>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-indicator"><div class="step-circle">!</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Контейнер не собирается — ошибки Docker</div>
+            <div class="step-body">
+              Проверьте что Docker Desktop запущен и имеет достаточно ресурсов (минимум 4GB RAM). Попробуйте пересобрать:
+              <div class="code-block" style="margin-top:10px;">
+                <div class="code-header"><span class="code-lang">vs code — command palette</span></div>
+                <div class="code-body"><pre><span class="cv2">Dev Containers: Rebuild Container</span></pre></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-indicator"><div class="step-circle">!</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Порты не пробрасываются</div>
+            <div class="step-body">
+              В VS Code проверьте вкладку <strong>Ports</strong> (рядом с Terminal). Если портов нет — добавьте вручную: нажмите <strong>"Forward a Port"</strong> и введите <code>3009</code> и <code>5180</code>.
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-indicator"><div class="step-circle">!</div></div>
+          <div class="step-content">
+            <div class="step-title">Агент зависает или нет прав</div>
+            <div class="step-body">
+              Добавьте в <code>.env</code> внутри контейнера:
+              <div class="code-block" style="margin-top:10px;">
+                <div class="code-header"><span class="code-lang">.env</span></div>
+                <div class="code-body"><pre><span class="ck">AGENT_BYPASS_PERMISSIONS</span>=<span class="cv">true</span>
+<span class="ck">AGENT_USE_SUBAGENTS</span>=<span class="cv">false</span>  <span class="cm"># если медленно работает</span></pre></div>
+              </div>
+              Перезапустите <code>npm run dev</code>.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+</div>
+
+<script>
+  function copyCode(btn) {
+    const pre = btn.closest('.code-block').querySelector('pre');
+    const text = pre.innerText.replace(/^\$\s*/gm, '').replace(/^#.*$/gm, '').trim();
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+
+  const sections = document.querySelectorAll('.section');
+  const navItems = document.querySelectorAll('.nav-item');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navItems.forEach(i => i.classList.remove('active'));
+        const active = document.querySelector(`.nav-item[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { threshold: 0.3 });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

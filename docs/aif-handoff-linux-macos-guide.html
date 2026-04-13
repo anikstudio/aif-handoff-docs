@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIF Handoff — Linux / macOS Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0f11;
+    --bg2: #13151a;
+    --bg3: #1a1d24;
+    --border: #232730;
+    --border2: #2e3340;
+    --text: #e2e4ea;
+    --text2: #8b90a0;
+    --text3: #555b6e;
+    --green: #4ade80;
+    --green2: #22c55e;
+    --green-dim: rgba(74,222,128,0.08);
+    --green-glow: rgba(74,222,128,0.18);
+    --amber: #fbbf24;
+    --amber-dim: rgba(251,191,36,0.08);
+    --blue: #60a5fa;
+    --blue-dim: rgba(96,165,250,0.08);
+    --red: #f87171;
+    --purple: #a78bfa;
+    --purple-dim: rgba(167,139,250,0.08);
+    --code-bg: #0a0b0d;
+    --radius: 8px;
+    --radius2: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.7; min-height: 100vh; }
+  body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; opacity: 0.4; }
+  .wrapper { position: relative; z-index: 1; display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+
+  /* SIDEBAR */
+  .sidebar { position: sticky; top: 0; height: 100vh; overflow-y: auto; border-right: 1px solid var(--border); background: var(--bg2); display: flex; flex-direction: column; }
+  .sidebar-header { padding: 28px 24px 20px; border-bottom: 1px solid var(--border); }
+  .logo { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .logo-icon { width: 32px; height: 32px; background: var(--green-dim); border: 1px solid var(--green); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 13px; color: var(--green); letter-spacing: -0.5px; flex-shrink: 0; }
+  .logo-text { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; color: var(--text); letter-spacing: -0.3px; }
+  .logo-sub { font-size: 11px; color: var(--text3); letter-spacing: 0.5px; }
+  .sidebar-nav { padding: 16px 0; flex: 1; }
+  .nav-section { padding: 0 16px; margin-bottom: 20px; }
+  .nav-section-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); padding: 0 8px; margin-bottom: 6px; }
+  .nav-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 6px; color: var(--text2); text-decoration: none; font-size: 12.5px; transition: all 0.15s; cursor: pointer; border: none; background: none; width: 100%; text-align: left; }
+  .nav-item:hover { background: var(--bg3); color: var(--text); }
+  .nav-item.active { background: var(--green-dim); color: var(--green); border: 1px solid rgba(74,222,128,0.2); }
+  .nav-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border2); flex-shrink: 0; }
+  .nav-item.active .nav-dot { background: var(--green); }
+  .nav-num { font-size: 10px; color: var(--text3); margin-left: auto; }
+  .sidebar-footer { padding: 16px 24px; border-top: 1px solid var(--border); }
+  .status-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--green); background: var(--green-dim); border: 1px solid rgba(74,222,128,0.2); border-radius: 20px; padding: 4px 10px; }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  /* MAIN */
+  .main { padding: 0; max-width: 860px; }
+
+  /* HERO */
+  .hero { padding: 60px 56px 48px; border-bottom: 1px solid var(--border); position: relative; overflow: hidden; }
+  .hero::after { content: ''; position: absolute; top: -60px; right: -60px; width: 300px; height: 300px; background: radial-gradient(circle, var(--green-glow) 0%, transparent 70%); pointer-events: none; }
+  .hero-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--green); background: var(--green-dim); border: 1px solid rgba(74,222,128,0.25); border-radius: 4px; padding: 3px 10px; margin-bottom: 20px; letter-spacing: 0.5px; }
+  .hero h1 { font-family: 'Syne', sans-serif; font-size: 38px; font-weight: 800; line-height: 1.15; letter-spacing: -1px; color: var(--text); margin-bottom: 16px; }
+  .hero h1 span { color: var(--green); }
+  .hero-desc { font-size: 14px; color: var(--text2); max-width: 520px; line-height: 1.8; margin-bottom: 28px; }
+  .hero-meta { display: flex; gap: 24px; flex-wrap: wrap; }
+  .meta-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text3); }
+  .meta-item strong { color: var(--text2); }
+
+  /* OS TABS */
+  .os-bar { padding: 20px 56px; border-bottom: 1px solid var(--border); background: var(--bg2); display: flex; gap: 8px; align-items: center; }
+  .os-tab { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; border: 1px solid; }
+  .os-tab.linux { background: rgba(251,191,36,0.08); border-color: var(--amber); color: var(--amber); }
+  .os-tab.macos { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+  .os-sep { color: var(--text3); font-size: 12px; }
+
+  /* CONTENT */
+  .content { padding: 0 56px 80px; }
+  .section { padding-top: 52px; border-bottom: 1px solid var(--border); padding-bottom: 48px; animation: fadeUp 0.4s ease both; }
+  .section:last-child { border-bottom: none; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .section-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 28px; }
+  .section-num { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; color: var(--green); background: var(--green-dim); border: 1px solid rgba(74,222,128,0.2); border-radius: 4px; padding: 2px 8px; margin-top: 4px; flex-shrink: 0; letter-spacing: 0.5px; }
+  .section-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; line-height: 1.3; }
+  .section-desc { font-size: 13px; color: var(--text2); margin-top: 6px; line-height: 1.7; }
+
+  /* CALLOUT */
+  .callout { border-radius: var(--radius); padding: 14px 18px; margin-bottom: 20px; border-left: 3px solid; font-size: 13px; line-height: 1.7; }
+  .callout.info    { background: var(--blue-dim);  border-color: var(--blue);  color: var(--blue); }
+  .callout.success { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+  .callout.warning { background: var(--amber-dim); border-color: var(--amber); color: var(--amber); }
+  .callout strong { font-weight: 600; }
+  .callout span { color: var(--text2); }
+
+  /* OS DIFF */
+  .os-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; }
+  .os-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius2); overflow: hidden; }
+  .os-card-header { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; }
+  .os-card.linux .os-card-header { background: rgba(251,191,36,0.06); color: var(--amber); }
+  .os-card.macos .os-card-header { background: var(--green-dim); color: var(--green); }
+  .os-card-body { padding: 14px 16px; }
+
+  /* CODE */
+  .code-block { background: var(--code-bg); border: 1px solid var(--border); border-radius: var(--radius); margin: 16px 0; overflow: hidden; }
+  .code-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid var(--border); background: var(--bg2); }
+  .code-lang { font-size: 11px; color: var(--text3); letter-spacing: 0.5px; text-transform: uppercase; }
+  .copy-btn { font-size: 11px; color: var(--text3); background: none; border: 1px solid var(--border2); border-radius: 4px; padding: 3px 10px; cursor: pointer; font-family: 'JetBrains Mono', monospace; transition: all 0.15s; }
+  .copy-btn:hover { color: var(--green); border-color: var(--green); }
+  .copy-btn.copied { color: var(--green); border-color: var(--green); background: var(--green-dim); }
+  .code-body { padding: 18px 20px; overflow-x: auto; }
+  pre { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.8; color: var(--text); white-space: pre; }
+  .cm { color: var(--text3); }
+  .ck { color: var(--purple); }
+  .cv { color: var(--green); }
+  .cs { color: var(--amber); }
+  .ce { color: var(--red); }
+  .cb { color: var(--blue); }
+  .prompt { color: var(--green2); user-select: none; }
+
+  /* STEPS */
+  .steps { display: flex; flex-direction: column; gap: 0; }
+  .step { display: flex; gap: 20px; padding: 20px 0; border-bottom: 1px solid var(--border); }
+  .step:last-child { border-bottom: none; }
+  .step-indicator { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+  .step-circle { width: 32px; height: 32px; border-radius: 50%; background: var(--bg3); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--text2); font-family: 'Syne', sans-serif; flex-shrink: 0; }
+  .step.done .step-circle { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+  .step-line { width: 1px; flex: 1; background: var(--border); margin-top: 4px; }
+  .step:last-child .step-line { display: none; }
+  .step-content { flex: 1; padding-bottom: 8px; }
+  .step-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+  .step-body { font-size: 13px; color: var(--text2); line-height: 1.7; }
+
+  /* INLINE CODE */
+  code { font-family: 'JetBrains Mono', monospace; background: var(--bg3); border: 1px solid var(--border2); border-radius: 4px; padding: 1px 6px; font-size: 12px; color: var(--green); }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; margin: 16px 0; border-radius: var(--radius); border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  thead { background: var(--bg2); border-bottom: 1px solid var(--border); }
+  th { padding: 10px 16px; text-align: left; font-size: 11px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text3); font-weight: 500; }
+  td { padding: 10px 16px; border-bottom: 1px solid var(--border); color: var(--text2); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--bg3); }
+  td:first-child { color: var(--green); font-weight: 500; }
+  td code { color: var(--amber); }
+
+  /* CARDS */
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; }
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius2); padding: 18px; transition: border-color 0.15s; }
+  .card:hover { border-color: var(--border2); }
+  .card-icon { font-size: 20px; margin-bottom: 10px; }
+  .card-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .card-desc { font-size: 12px; color: var(--text3); line-height: 1.6; }
+
+  /* CHECKLIST */
+  .checklist { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; }
+  .check-item { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--text2); }
+  .check-icon { width: 18px; height: 18px; border-radius: 4px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; margin-top: 1px; }
+  .check-icon.ok   { background: var(--green-dim); color: var(--green); border: 1px solid rgba(74,222,128,0.3); }
+  .check-icon.warn { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(251,191,36,0.3); }
+  .check-icon.info { background: var(--blue-dim);  color: var(--blue);  border: 1px solid rgba(96,165,250,0.3); }
+
+  /* TAG */
+  .tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 4px; margin: 2px; }
+  .tag.green  { background: var(--green-dim); color: var(--green); border: 1px solid rgba(74,222,128,0.2); }
+  .tag.amber  { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(251,191,36,0.2); }
+  .tag.blue   { background: var(--blue-dim);  color: var(--blue);  border: 1px solid rgba(96,165,250,0.2); }
+
+  /* PIPELINE */
+  .pipeline { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .pipe-stage { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .pipe-box { padding: 8px 14px; border-radius: 6px; font-size: 11px; font-weight: 600; border: 1px solid; white-space: nowrap; }
+  .pipe-label { font-size: 10px; color: var(--text3); }
+  .pipe-arrow { color: var(--text3); font-size: 16px; align-self: flex-start; margin-top: 10px; }
+  .stage-backlog  { background: rgba(139,144,160,0.1); border-color: #555b6e; color: #8b90a0; }
+  .stage-planning { background: rgba(251,191,36,0.1);  border-color: #b45309; color: var(--amber); }
+  .stage-ready    { background: rgba(96,165,250,0.1);  border-color: #2563eb; color: var(--blue); }
+  .stage-impl     { background: rgba(167,139,250,0.1); border-color: #7c3aed; color: var(--purple); }
+  .stage-review   { background: rgba(251,191,36,0.1);  border-color: #b45309; color: var(--amber); }
+  .stage-done     { background: var(--green-dim);      border-color: #16a34a; color: var(--green); }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  @media (max-width: 900px) {
+    .wrapper { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .hero { padding: 40px 28px 32px; }
+    .content { padding: 0 28px 60px; }
+    .cards, .os-grid { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 28px; }
+    .os-bar { padding: 16px 28px; flex-wrap: wrap; }
+  }
+
+  p { margin-bottom: 12px; }
+  p:last-child { margin-bottom: 0; }
+  ul { padding-left: 20px; color: var(--text2); font-size: 13px; }
+  ul li { margin-bottom: 6px; }
+  h3 { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 600; color: var(--text); margin: 20px 0 10px; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="logo">
+      <div class="logo-icon">AF</div>
+      <div>
+        <div class="logo-text">AIF Handoff</div>
+        <div class="logo-sub">// linux · macos guide</div>
+      </div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-label">Начало</div>
+      <a class="nav-item active" href="#prereq">
+        <span class="nav-dot"></span> Требования
+        <span class="nav-num">01</span>
+      </a>
+      <a class="nav-item" href="#node">
+        <span class="nav-dot"></span> Node.js 22+
+        <span class="nav-num">02</span>
+      </a>
+      <a class="nav-item" href="#claude-cli">
+        <span class="nav-dot"></span> Claude CLI
+        <span class="nav-num">03</span>
+      </a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Установка</div>
+      <a class="nav-item" href="#clone">
+        <span class="nav-dot"></span> Клонирование
+        <span class="nav-num">04</span>
+      </a>
+      <a class="nav-item" href="#install">
+        <span class="nav-dot"></span> npm install
+        <span class="nav-num">05</span>
+      </a>
+      <a class="nav-item" href="#database">
+        <span class="nav-dot"></span> База данных
+        <span class="nav-num">06</span>
+      </a>
+      <a class="nav-item" href="#env">
+        <span class="nav-dot"></span> Конфигурация .env
+        <span class="nav-num">07</span>
+      </a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Запуск</div>
+      <a class="nav-item" href="#auth">
+        <span class="nav-dot"></span> Авторизация Claude
+        <span class="nav-num">08</span>
+      </a>
+      <a class="nav-item" href="#launch">
+        <span class="nav-dot"></span> Запуск
+        <span class="nav-num">09</span>
+      </a>
+      <a class="nav-item" href="#project">
+        <span class="nav-dot"></span> Создание проекта
+        <span class="nav-num">10</span>
+      </a>
+      <a class="nav-item" href="#troubleshoot">
+        <span class="nav-dot"></span> Устранение проблем
+        <span class="nav-num">11</span>
+      </a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="status-pill">
+      <span class="status-dot"></span>
+      Linux · macOS · без Docker
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">// linux · macos · native · no docker</div>
+    <h1>AIF Handoff<br><span>Linux / macOS</span> Guide</h1>
+    <p class="hero-desc">
+      Нативная установка AIF Handoff на Linux и macOS без Docker — прямо через Node.js и npm. Подходит для локальной разработки и серверного деплоя на Unix-системах.
+    </p>
+    <div class="hero-meta">
+      <div class="meta-item">🐧 <strong>Linux (Ubuntu / Debian / Arch)</strong></div>
+      <div class="meta-item">🍎 <strong>macOS (Monterey+)</strong></div>
+      <div class="meta-item">⬢ <strong>Node.js 22+</strong></div>
+      <div class="meta-item">🔑 <strong>Claude аккаунт</strong></div>
+    </div>
+  </div>
+
+  <!-- OS BAR -->
+  <div class="os-bar">
+    <div class="os-tab linux">🐧 Linux</div>
+    <span class="os-sep">+</span>
+    <div class="os-tab macos">🍎 macOS</div>
+    <span class="os-sep" style="margin-left:8px; font-size:11px;">Различия отмечены в каждом шаге</span>
+  </div>
+
+  <!-- PIPELINE -->
+  <div style="padding: 24px 56px; border-bottom: 1px solid var(--border); background: var(--bg2);">
+    <div style="font-size:11px; color:var(--text3); letter-spacing:1px; text-transform:uppercase; margin-bottom:14px;">Pipeline задач</div>
+    <div class="pipeline">
+      <div class="pipe-stage"><div class="pipe-box stage-backlog">Backlog</div><div class="pipe-label">human</div></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-stage"><div class="pipe-box stage-planning">Planning</div><div class="pipe-label">ai</div></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-stage"><div class="pipe-box stage-ready">Plan Ready</div><div class="pipe-label">ai + human</div></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-stage"><div class="pipe-box stage-impl">Implementing</div><div class="pipe-label">ai</div></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-stage"><div class="pipe-box stage-review">Review</div><div class="pipe-label">ai</div></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-stage"><div class="pipe-box stage-done">Done</div><div class="pipe-label">✓</div></div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- 01 PREREQ -->
+    <section class="section" id="prereq">
+      <div class="section-header">
+        <span class="section-num">01</span>
+        <div>
+          <div class="section-title">Системные требования</div>
+          <div class="section-desc">Что нужно установить перед началом</div>
+        </div>
+      </div>
+
+      <div class="cards">
+        <div class="card">
+          <div class="card-icon">⬢</div>
+          <div class="card-title">Node.js 22+</div>
+          <div class="card-desc">Рекомендуется установка через <code>nvm</code> (Node Version Manager) — позволяет легко переключать версии.</div>
+        </div>
+        <div class="card">
+          <div class="card-icon">🤖</div>
+          <div class="card-title">Claude Code CLI</div>
+          <div class="card-desc">Agent SDK запускает Claude Code как дочерний процесс — CLI обязателен. Устанавливается через <code>npm install -g</code> или нативный инсталлятор.</div>
+        </div>
+        <div class="card">
+          <div class="card-icon">🔑</div>
+          <div class="card-title">Claude аккаунт</div>
+          <div class="card-desc">Подписка Claude (OAuth через <code>claude login</code>) или Anthropic API Key. Credentials хранятся в <code>~/.claude/</code>.</div>
+        </div>
+        <div class="card">
+          <div class="card-icon">🌿</div>
+          <div class="card-title">Git</div>
+          <div class="card-desc">Предустановлен на большинстве Linux-дистрибутивов. На macOS устанавливается с Xcode Command Line Tools.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 NODE -->
+    <section class="section" id="node">
+      <div class="section-header">
+        <span class="section-num">02</span>
+        <div>
+          <div class="section-title">Установка Node.js 22+</div>
+          <div class="section-desc">Через nvm — рекомендуемый способ для обеих систем</div>
+        </div>
+      </div>
+
+      <h3>Установка nvm (Linux и macOS)</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="prompt">$</span> curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+
+<span class="cm"># Применить изменения в текущей сессии</span>
+<span class="prompt">$</span> source ~/.bashrc   <span class="cm"># bash</span>
+<span class="prompt">$</span> source ~/.zshrc    <span class="cm"># zsh (macOS по умолчанию)</span>
+
+<span class="cm"># Установить Node.js 22</span>
+<span class="prompt">$</span> nvm install 22
+<span class="prompt">$</span> nvm use 22
+<span class="prompt">$</span> node --version    <span class="cm"># должно показать v22.x.x</span></pre></div>
+      </div>
+
+      <div class="os-grid">
+        <div class="os-card linux">
+          <div class="os-card-header">🐧 Linux — альтернатива</div>
+          <div class="os-card-body">
+            <div class="code-block" style="margin:0;">
+              <div class="code-header"><span class="code-lang">bash — Ubuntu/Debian</span></div>
+              <div class="code-body"><pre><span class="prompt">$</span> curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+<span class="prompt">$</span> sudo apt-get install -y nodejs</pre></div>
+            </div>
+          </div>
+        </div>
+        <div class="os-card macos">
+          <div class="os-card-header">🍎 macOS — альтернатива</div>
+          <div class="os-card-body">
+            <div class="code-block" style="margin:0;">
+              <div class="code-header"><span class="code-lang">bash — Homebrew</span></div>
+              <div class="code-body"><pre><span class="prompt">$</span> brew install node@22
+<span class="prompt">$</span> brew link node@22</pre></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 CLAUDE CLI -->
+    <section class="section" id="claude-cli">
+      <div class="section-header">
+        <span class="section-num">03</span>
+        <div>
+          <div class="section-title">Установка Claude Code CLI</div>
+          <div class="section-desc">Глобальная установка — обязательна для работы Agent SDK</div>
+        </div>
+      </div>
+
+      <h3>Установка через npm</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="prompt">$</span> npm install -g @anthropic-ai/claude-code</pre></div>
+      </div>
+
+      <h3>Или нативный инсталлятор (рекомендуется)</h3>
+      <p style="font-size:13px; color:var(--text2);">Нативный инсталлятор создаёт настоящий бинарник — Agent SDK найдёт его без дополнительной настройки:</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="cm"># Сначала установить через npm, затем выполнить нативную установку</span>
+<span class="prompt">$</span> npm install -g @anthropic-ai/claude-code
+<span class="prompt">$</span> claude install
+
+<span class="cm"># Добавить в PATH (если не добавлено автоматически)</span>
+<span class="prompt">$</span> echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+<span class="prompt">$</span> source ~/.bashrc</pre></div>
+      </div>
+
+      <h3>Проверить установку</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="prompt">$</span> which claude
+<span class="prompt">$</span> claude --version
+<span class="cm"># Ожидаемый вывод: 2.x.x (Claude Code)</span></pre></div>
+      </div>
+
+      <div class="callout success">
+        <strong>Нативный бинарник:</strong> <span>После <code>claude install</code> исполняемый файл находится в <code>~/.local/bin/claude</code>. Agent SDK находит его автоматически без дополнительной настройки.</span>
+      </div>
+    </section>
+
+    <!-- 04 CLONE -->
+    <section class="section" id="clone">
+      <div class="section-header">
+        <span class="section-num">04</span>
+        <div>
+          <div class="section-title">Клонирование репозитория</div>
+          <div class="section-desc">Получить исходный код aif-handoff</div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="prompt">$</span> git clone https://github.com/lee-to/aif-handoff.git
+<span class="prompt">$</span> cd aif-handoff</pre></div>
+      </div>
+
+      <p style="font-size:13px; color:var(--text2);">Структура репозитория:</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">tree</span></div>
+        <div class="code-body"><pre><span class="cv">aif-handoff/</span>
+├── <span class="cb">packages/</span>
+│   ├── <span class="cs">api/</span>     <span class="cm"># Hono REST + WebSocket  → :3009</span>
+│   ├── <span class="cs">web/</span>     <span class="cm"># React Kanban UI        → :5180</span>
+│   └── <span class="cs">agent/</span>   <span class="cm"># Координатор субагентов</span>
+├── <span class="cs">.env.example</span>
+└── <span class="cs">package.json</span></pre></div>
+      </div>
+    </section>
+
+    <!-- 05 INSTALL -->
+    <section class="section" id="install">
+      <div class="section-header">
+        <span class="section-num">05</span>
+        <div>
+          <div class="section-title">Установка зависимостей</div>
+          <div class="section-desc">Установить пакеты для всех трёх сервисов</div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="prompt">$</span> npm install</pre></div>
+      </div>
+
+      <div class="checklist">
+        <div class="check-item">
+          <div class="check-icon warn">!</div>
+          <span>Предупреждения <code>deprecated</code> — безопасны, игнорируйте</span>
+        </div>
+        <div class="check-item">
+          <div class="check-icon ok">✓</div>
+          <span>После установки: <code>added N packages</code> — всё нормально</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 DATABASE -->
+    <section class="section" id="database">
+      <div class="section-header">
+        <span class="section-num">06</span>
+        <div>
+          <div class="section-title">Инициализация базы данных</div>
+          <div class="section-desc">Создать SQLite-файл и применить все миграции</div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="prompt">$</span> npm run init
+<span class="cm"># Создаёт: ./data/aif.sqlite</span>
+<span class="cm"># Применяет все миграции (11 штук)</span></pre></div>
+      </div>
+
+      <p style="font-size:13px; color:var(--text2);">Успешный вывод:</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">log</span></div>
+        <div class="code-body"><pre><span class="cv">{"msg":"Migrations complete","newVersion":11}</span>
+<span class="cv">{"msg":"Index bootstrap complete","indexCount":16}</span>
+<span class="cv">{"msg":"Database connection closed"}</span></pre></div>
+      </div>
+
+      <p style="font-size:13px; color:var(--text2); margin-top:12px;">Для обновления схемы в будущем:</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="prompt">$</span> npm run db:push</pre></div>
+      </div>
+    </section>
+
+    <!-- 07 ENV -->
+    <section class="section" id="env">
+      <div class="section-header">
+        <span class="section-num">07</span>
+        <div>
+          <div class="section-title">Конфигурация .env</div>
+          <div class="section-desc">Настройка переменных окружения</div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="prompt">$</span> cp .env.example .env</pre></div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Переменная</th><th>По умолчанию</th><th>Описание</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>ANTHROPIC_API_KEY</td>
+              <td><span style="color:var(--text3)">—</span></td>
+              <td>Оставить пустым если используется <code>claude login</code></td>
+            </tr>
+            <tr>
+              <td>PORT</td>
+              <td><code>3009</code></td>
+              <td>Порт API-сервера</td>
+            </tr>
+            <tr>
+              <td>WEB_PORT</td>
+              <td><code>5180</code></td>
+              <td>Порт Web UI</td>
+            </tr>
+            <tr>
+              <td>AGENT_BYPASS_PERMISSIONS</td>
+              <td><code>true</code></td>
+              <td>Разрешить агенту выполнять команды без подтверждения</td>
+            </tr>
+            <tr>
+              <td>AGENT_USE_SUBAGENTS</td>
+              <td><code>true</code></td>
+              <td><code>false</code> для ускорения (однопроходный режим)</td>
+            </tr>
+            <tr>
+              <td>POLL_INTERVAL_MS</td>
+              <td><code>30000</code></td>
+              <td>Интервал опроса задач координатором (мс)</td>
+            </tr>
+            <tr>
+              <td>DATABASE_URL</td>
+              <td><code>./data/aif.sqlite</code></td>
+              <td>Путь к SQLite-файлу</td>
+            </tr>
+            <tr>
+              <td>LOG_LEVEL</td>
+              <td><code>debug</code></td>
+              <td>Уровень логов: <code>fatal</code> / <code>error</code> / <code>warn</code> / <code>info</code> / <code>debug</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Минимальный .env</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">.env</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="cm"># Авторизация (оставить пустым если claude login)</span>
+<span class="cm"># ANTHROPIC_API_KEY=sk-ant-xxxxx</span>
+
+<span class="ck">PORT</span>=<span class="cv">3009</span>
+<span class="ck">WEB_PORT</span>=<span class="cv">5180</span>
+<span class="ck">DATABASE_URL</span>=<span class="cv">./data/aif.sqlite</span>
+
+<span class="ck">AGENT_BYPASS_PERMISSIONS</span>=<span class="cv">true</span>
+<span class="ck">POLL_INTERVAL_MS</span>=<span class="cv">30000</span>
+<span class="ck">LOG_LEVEL</span>=<span class="cv">debug</span></pre></div>
+      </div>
+    </section>
+
+    <!-- 08 AUTH -->
+    <section class="section" id="auth">
+      <div class="section-header">
+        <span class="section-num">08</span>
+        <div>
+          <div class="section-title">Авторизация Claude</div>
+          <div class="section-desc">Настроить доступ агента к Claude</div>
+        </div>
+      </div>
+
+      <h3>Option A — Claude подписка (OAuth)</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="prompt">$</span> claude login</pre></div>
+      </div>
+      <p style="font-size:13px; color:var(--text2);">Откройте URL из терминала в браузере и завершите OAuth. Credentials сохранятся в <code>~/.claude/.credentials.json</code>.</p>
+
+      <h3>Option B — API Key</h3>
+      <p style="font-size:13px; color:var(--text2);">Добавьте в <code>.env</code>:</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">.env</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="ck">ANTHROPIC_API_KEY</span>=<span class="cv">sk-ant-xxxxx</span></pre></div>
+      </div>
+
+      <h3>Проверить авторизацию</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="prompt">$</span> ls ~/.claude/
+<span class="cm"># Должен быть файл .credentials.json</span>
+
+<span class="prompt">$</span> test -f ~/.claude/.credentials.json && echo "OK" || echo "NOT FOUND"</pre></div>
+      </div>
+    </section>
+
+    <!-- 09 LAUNCH -->
+    <section class="section" id="launch">
+      <div class="section-header">
+        <span class="section-num">09</span>
+        <div>
+          <div class="section-title">Запуск всех сервисов</div>
+          <div class="section-desc">Одна команда запускает API, Web UI и Agent параллельно</div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="prompt">$</span> npm run dev</pre></div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Сервис</th><th>URL</th><th>Описание</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>API</td>
+              <td><code>http://localhost:3009</code></td>
+              <td>Hono REST + WebSocket сервер</td>
+            </tr>
+            <tr>
+              <td>Web UI</td>
+              <td><code>http://localhost:5180</code></td>
+              <td>React Kanban-доска</td>
+            </tr>
+            <tr>
+              <td>Agent</td>
+              <td><em>background</em></td>
+              <td>Координатор субагентов, polling каждые 30 сек</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Признаки успешного запуска</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">log</span></div>
+        <div class="code-body"><pre><span class="cs">@aif/web:dev:</span>   <span class="cv">➜  Local:   http://localhost:5180/</span>
+<span class="cs">@aif/api:dev:</span>   <span class="cv">{"msg":"API server started","port":3009}</span>
+<span class="cs">@aif/agent:dev:</span> <span class="cv">{"msg":"Agent coordinator is running"}</span>
+<span class="cs">@aif/agent:dev:</span> <span class="cv">{"msg":"Poll cycle complete"}</span>  <span class="cm">← каждые 30 сек</span></pre></div>
+      </div>
+
+      <h3>Проверить готовность агента</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="prompt">$</span> curl -s http://localhost:3009/agent/readiness</pre></div>
+      </div>
+    </section>
+
+    <!-- 10 PROJECT -->
+    <section class="section" id="project">
+      <div class="section-header">
+        <span class="section-num">10</span>
+        <div>
+          <div class="section-title">Создание проекта в UI</div>
+          <div class="section-desc">Подключить ваш рабочий проект к aif-handoff</div>
+        </div>
+      </div>
+
+      <div class="steps">
+        <div class="step done">
+          <div class="step-indicator"><div class="step-circle">1</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Открыть Kanban UI</div>
+            <div class="step-body">Перейдите на <code>http://localhost:5180</code></div>
+          </div>
+        </div>
+        <div class="step done">
+          <div class="step-indicator"><div class="step-circle">2</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Создать проект</div>
+            <div class="step-body">Нажмите на селектор проектов (верхний левый угол) → <strong>Create Project</strong></div>
+          </div>
+        </div>
+        <div class="step done">
+          <div class="step-indicator"><div class="step-circle">3</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Указать Root Path</div>
+            <div class="step-body">
+              В поле <strong>Root Path</strong> укажите абсолютный путь к вашему рабочему проекту:
+              <div class="os-grid" style="margin-top:10px;">
+                <div class="os-card linux">
+                  <div class="os-card-header">🐧 Linux</div>
+                  <div class="os-card-body"><code>/home/user/my-project</code></div>
+                </div>
+                <div class="os-card macos">
+                  <div class="os-card-header">🍎 macOS</div>
+                  <div class="os-card-body"><code>/Users/username/my-project</code></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step done">
+          <div class="step-indicator"><div class="step-circle">4</div></div>
+          <div class="step-content">
+            <div class="step-title">Добавить задачу в Backlog</div>
+            <div class="step-body">Нажмите <strong>+ Add task</strong> в колонке Backlog. Через ~30 сек агент подхватит задачу и начнёт обработку.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout success">
+        <strong>Всё готово:</strong> <span>API на <code>:3009</code> · Web UI на <code>:5180</code> · Agent работает нативно. Добавляйте задачи и наблюдайте за автономным прохождением стадий.</span>
+      </div>
+    </section>
+
+    <!-- 11 TROUBLESHOOT -->
+    <section class="section" id="troubleshoot">
+      <div class="section-header">
+        <span class="section-num">11</span>
+        <div>
+          <div class="section-title">Устранение проблем</div>
+          <div class="section-desc">Типичные проблемы на Linux и macOS</div>
+        </div>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-indicator"><div class="step-circle">!</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">claude: command not found после установки</div>
+            <div class="step-body">
+              Добавьте <code>~/.local/bin</code> в PATH:
+              <div class="code-block" style="margin-top:10px;">
+                <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+                <div class="code-body"><pre><span class="prompt">$</span> echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+<span class="prompt">$</span> source ~/.bashrc
+<span class="cm"># Для zsh (macOS):</span>
+<span class="prompt">$</span> echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
+<span class="prompt">$</span> source ~/.zshrc</pre></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-indicator"><div class="step-circle">!</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">EACCES — нет прав при npm install -g</div>
+            <div class="step-body">
+              Не используйте <code>sudo</code> с npm. Настройте глобальную директорию npm в домашней папке:
+              <div class="code-block" style="margin-top:10px;">
+                <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+                <div class="code-body"><pre><span class="prompt">$</span> mkdir -p ~/.npm-global
+<span class="prompt">$</span> npm config set prefix '~/.npm-global'
+<span class="prompt">$</span> echo 'export PATH="$HOME/.npm-global/bin:$PATH"' >> ~/.bashrc
+<span class="prompt">$</span> source ~/.bashrc</pre></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-indicator"><div class="step-circle">!</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Агент зависает или часто таймаутится</div>
+            <div class="step-body">
+              Добавьте в <code>.env</code>:
+              <div class="code-block" style="margin-top:10px;">
+                <div class="code-header"><span class="code-lang">.env</span></div>
+                <div class="code-body"><pre><span class="ck">AGENT_USE_SUBAGENTS</span>=<span class="cv">false</span></pre></div>
+              </div>
+              Перезапустите <code>npm run dev</code>.
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-indicator"><div class="step-circle">!</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Порт уже занят (EADDRINUSE)</div>
+            <div class="step-body">
+              Найдите и завершите процесс или измените порты в <code>.env</code>:
+              <div class="code-block" style="margin-top:10px;">
+                <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+                <div class="code-body"><pre><span class="cm"># Найти что занимает порт</span>
+<span class="prompt">$</span> lsof -i :3009
+<span class="prompt">$</span> lsof -i :5180</pre></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-indicator"><div class="step-circle">!</div></div>
+          <div class="step-content">
+            <div class="step-title">macOS — Gatekeeper блокирует claude</div>
+            <div class="step-body">
+              Если macOS блокирует запуск claude:
+              <div class="code-block" style="margin-top:10px;">
+                <div class="code-header"><span class="code-lang">bash — macOS</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+                <div class="code-body"><pre><span class="prompt">$</span> xattr -d com.apple.quarantine ~/.local/bin/claude</pre></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+</div>
+
+<script>
+  function copyCode(btn) {
+    const pre = btn.closest('.code-block').querySelector('pre');
+    const text = pre.innerText.replace(/^\$\s*/gm, '').replace(/^#.*$/gm, '').trim();
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+
+  const sections = document.querySelectorAll('.section');
+  const navItems = document.querySelectorAll('.nav-item');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navItems.forEach(i => i.classList.remove('active'));
+        const active = document.querySelector(`.nav-item[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { threshold: 0.3 });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

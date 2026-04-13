@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIF Handoff — Docker Setup Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0f11;
+    --bg2: #13151a;
+    --bg3: #1a1d24;
+    --border: #232730;
+    --border2: #2e3340;
+    --text: #e2e4ea;
+    --text2: #8b90a0;
+    --text3: #555b6e;
+    --green: #4ade80;
+    --green2: #22c55e;
+    --green-dim: rgba(74,222,128,0.08);
+    --green-glow: rgba(74,222,128,0.15);
+    --amber: #fbbf24;
+    --amber-dim: rgba(251,191,36,0.08);
+    --blue: #60a5fa;
+    --blue-dim: rgba(96,165,250,0.08);
+    --red: #f87171;
+    --purple: #a78bfa;
+    --purple-dim: rgba(167,139,250,0.08);
+    --cyan: #22d3ee;
+    --cyan-dim: rgba(34,211,238,0.08);
+    --code-bg: #0a0b0d;
+    --radius: 8px;
+    --radius2: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: 100vh;
+  }
+
+  /* ─── SIDEBAR ─── */
+  .sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    border-right: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar-header {
+    padding: 28px 24px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: var(--cyan-dim);
+    border: 1px solid var(--cyan);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 13px;
+    color: var(--cyan);
+    letter-spacing: -0.5px;
+    flex-shrink: 0;
+  }
+
+  .logo-text { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; color: var(--text); letter-spacing: -0.3px; }
+  .logo-sub { font-size: 11px; color: var(--text3); letter-spacing: 0.5px; }
+
+  .sidebar-nav { padding: 16px 0; flex: 1; }
+
+  .nav-section { padding: 0 16px; margin-bottom: 20px; }
+
+  .nav-section-label {
+    font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--text3); padding: 0 8px; margin-bottom: 6px;
+  }
+
+  .nav-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 10px; border-radius: 6px;
+    color: var(--text2); text-decoration: none;
+    font-size: 12.5px; transition: all 0.15s;
+    cursor: pointer; border: none; background: none;
+    width: 100%; text-align: left;
+  }
+
+  .nav-item:hover { background: var(--bg3); color: var(--text); }
+
+  .nav-item.active {
+    background: var(--cyan-dim);
+    color: var(--cyan);
+    border: 1px solid rgba(34,211,238,0.2);
+  }
+
+  .nav-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border2); flex-shrink: 0; }
+  .nav-item.active .nav-dot { background: var(--cyan); }
+  .nav-num { font-size: 10px; color: var(--text3); margin-left: auto; font-variant-numeric: tabular-nums; }
+
+  .sidebar-footer { padding: 16px 24px; border-top: 1px solid var(--border); }
+
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--cyan);
+    background: var(--cyan-dim);
+    border: 1px solid rgba(34,211,238,0.2);
+    border-radius: 20px; padding: 4px 10px;
+  }
+
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); animation: pulse 2s infinite; }
+
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  /* ─── MAIN ─── */
+  .main { padding: 0; max-width: 860px; }
+
+  /* ─── HERO ─── */
+  .hero {
+    padding: 60px 56px 48px;
+    border-bottom: 1px solid var(--border);
+    position: relative; overflow: hidden;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute; top: -60px; right: -60px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(34,211,238,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--cyan);
+    background: var(--cyan-dim);
+    border: 1px solid rgba(34,211,238,0.25);
+    border-radius: 4px; padding: 3px 10px;
+    margin-bottom: 20px; letter-spacing: 0.5px;
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 38px; font-weight: 800;
+    line-height: 1.15; letter-spacing: -1px;
+    color: var(--text); margin-bottom: 16px;
+  }
+
+  .hero h1 span { color: var(--cyan); }
+
+  .hero-desc {
+    font-size: 14px; color: var(--text2);
+    max-width: 520px; line-height: 1.8; margin-bottom: 28px;
+  }
+
+  .hero-meta { display: flex; gap: 24px; flex-wrap: wrap; }
+
+  .meta-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text3); }
+  .meta-item strong { color: var(--text2); }
+
+  /* ─── PIPELINE BAR ─── */
+  .pipeline-bar {
+    padding: 28px 56px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg2);
+  }
+
+  .pipeline-label { font-size: 11px; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 14px; }
+
+  .pipeline { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+  .pipe-stage { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+
+  .pipe-box {
+    padding: 8px 14px; border-radius: 6px;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.3px; border: 1px solid; white-space: nowrap;
+  }
+
+  .pipe-label { font-size: 10px; color: var(--text3); }
+  .pipe-arrow { color: var(--text3); font-size: 16px; align-self: flex-start; margin-top: 10px; }
+
+  .stage-backlog  { background: rgba(139,144,160,0.1); border-color: #555b6e; color: #8b90a0; }
+  .stage-planning { background: rgba(251,191,36,0.1);  border-color: #b45309; color: var(--amber); }
+  .stage-ready    { background: rgba(96,165,250,0.1);  border-color: #2563eb; color: var(--blue); }
+  .stage-impl     { background: rgba(167,139,250,0.1); border-color: #7c3aed; color: var(--purple); }
+  .stage-review   { background: rgba(251,191,36,0.1);  border-color: #b45309; color: var(--amber); }
+  .stage-done     { background: var(--green-dim);      border-color: #16a34a; color: var(--green); }
+
+  /* ─── CONTENT ─── */
+  .content { padding: 0 56px 80px; }
+
+  .section {
+    padding-top: 52px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 48px;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .section:last-child { border-bottom: none; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  .section-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 28px; }
+
+  .section-num {
+    font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700;
+    color: var(--cyan); background: var(--cyan-dim);
+    border: 1px solid rgba(34,211,238,0.2);
+    border-radius: 4px; padding: 2px 8px;
+    margin-top: 4px; flex-shrink: 0; letter-spacing: 0.5px;
+  }
+
+  .section-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; line-height: 1.3; }
+  .section-desc { font-size: 13px; color: var(--text2); margin-top: 6px; line-height: 1.7; }
+
+  /* ─── CALLOUT ─── */
+  .callout { border-radius: var(--radius); padding: 14px 18px; margin-bottom: 20px; border-left: 3px solid; font-size: 13px; line-height: 1.7; }
+  .callout.info    { background: var(--blue-dim);  border-color: var(--blue);  color: var(--blue); }
+  .callout.success { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+  .callout.warning { background: var(--amber-dim); border-color: var(--amber); color: var(--amber); }
+  .callout.docker  { background: var(--cyan-dim);  border-color: var(--cyan);  color: var(--cyan); }
+  .callout strong { font-weight: 600; }
+  .callout span { color: var(--text2); }
+
+  /* ─── CODE BLOCK ─── */
+  .code-block { background: var(--code-bg); border: 1px solid var(--border); border-radius: var(--radius); margin: 16px 0; overflow: hidden; }
+
+  .code-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px; border-bottom: 1px solid var(--border); background: var(--bg2);
+  }
+
+  .code-lang { font-size: 11px; color: var(--text3); letter-spacing: 0.5px; text-transform: uppercase; }
+
+  .copy-btn {
+    font-size: 11px; color: var(--text3);
+    background: none; border: 1px solid var(--border2);
+    border-radius: 4px; padding: 3px 10px;
+    cursor: pointer; font-family: 'JetBrains Mono', monospace; transition: all 0.15s;
+  }
+
+  .copy-btn:hover { color: var(--cyan); border-color: var(--cyan); }
+  .copy-btn.copied { color: var(--cyan); border-color: var(--cyan); background: var(--cyan-dim); }
+
+  .code-body { padding: 18px 20px; overflow-x: auto; }
+
+  pre { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.8; color: var(--text); white-space: pre; }
+
+  .cm { color: var(--text3); }
+  .ck { color: var(--purple); }
+  .cv { color: var(--green); }
+  .cs { color: var(--amber); }
+  .ce { color: var(--red); }
+  .cb { color: var(--blue); }
+  .cc { color: var(--cyan); }
+  .prompt { color: var(--cyan); user-select: none; }
+
+  /* ─── STEPS ─── */
+  .steps { display: flex; flex-direction: column; gap: 0; }
+
+  .step { display: flex; gap: 20px; padding: 20px 0; border-bottom: 1px solid var(--border); }
+  .step:last-child { border-bottom: none; }
+
+  .step-indicator { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+
+  .step-circle {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--bg3); border: 1px solid var(--border2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; color: var(--text2);
+    font-family: 'Syne', sans-serif; flex-shrink: 0; position: relative; z-index: 1;
+  }
+
+  .step.done .step-circle { background: var(--cyan-dim); border-color: var(--cyan); color: var(--cyan); }
+
+  .step-line { width: 1px; flex: 1; background: var(--border); margin-top: 4px; }
+  .step:last-child .step-line { display: none; }
+
+  .step-content { flex: 1; padding-bottom: 8px; }
+  .step-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+  .step-body { font-size: 13px; color: var(--text2); line-height: 1.7; }
+
+  /* ─── INLINE CODE ─── */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: 4px; padding: 1px 6px; font-size: 12px; color: var(--cyan);
+  }
+
+  /* ─── TABLE ─── */
+  .table-wrap { overflow-x: auto; margin: 16px 0; border-radius: var(--radius); border: 1px solid var(--border); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+
+  thead { background: var(--bg2); border-bottom: 1px solid var(--border); }
+
+  th { padding: 10px 16px; text-align: left; font-size: 11px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text3); font-weight: 500; }
+
+  td { padding: 10px 16px; border-bottom: 1px solid var(--border); color: var(--text2); vertical-align: top; }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--bg3); }
+  td:first-child { color: var(--cyan); font-weight: 500; }
+  td code { color: var(--amber); }
+
+  /* ─── CARDS ─── */
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; }
+
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius2); padding: 18px; transition: border-color 0.15s; }
+  .card:hover { border-color: var(--border2); }
+  .card-icon { font-size: 20px; margin-bottom: 10px; }
+  .card-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .card-desc { font-size: 12px; color: var(--text3); line-height: 1.6; }
+
+  /* ─── CHECKLIST ─── */
+  .checklist { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; }
+
+  .check-item { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--text2); }
+
+  .check-icon { width: 18px; height: 18px; border-radius: 4px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; margin-top: 1px; }
+  .check-icon.ok   { background: var(--green-dim); color: var(--green); border: 1px solid rgba(74,222,128,0.3); }
+  .check-icon.warn { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(251,191,36,0.3); }
+  .check-icon.info { background: var(--cyan-dim);  color: var(--cyan);  border: 1px solid rgba(34,211,238,0.3); }
+
+  /* ─── TAG ─── */
+  .tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 4px; margin: 2px; }
+  .tag.green  { background: var(--green-dim);  color: var(--green);  border: 1px solid rgba(74,222,128,0.2); }
+  .tag.amber  { background: var(--amber-dim);  color: var(--amber);  border: 1px solid rgba(251,191,36,0.2); }
+  .tag.blue   { background: var(--blue-dim);   color: var(--blue);   border: 1px solid rgba(96,165,250,0.2); }
+  .tag.purple { background: var(--purple-dim); color: var(--purple); border: 1px solid rgba(167,139,250,0.2); }
+  .tag.cyan   { background: var(--cyan-dim);   color: var(--cyan);   border: 1px solid rgba(34,211,238,0.2); }
+
+  /* ─── AUTH OPTIONS ─── */
+  .auth-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; }
+
+  .auth-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius2); padding: 20px;
+    position: relative; overflow: hidden;
+  }
+
+  .auth-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  }
+
+  .auth-card.option-a::before { background: var(--amber); }
+  .auth-card.option-b::before { background: var(--cyan); }
+
+  .auth-card-label { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+  .auth-card.option-a .auth-card-label { color: var(--amber); }
+  .auth-card.option-b .auth-card-label { color: var(--cyan); }
+
+  .auth-card-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+  .auth-card-desc { font-size: 12px; color: var(--text3); line-height: 1.6; }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    .wrapper { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .hero { padding: 40px 28px 32px; }
+    .content { padding: 0 28px 60px; }
+    .cards, .auth-options { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 28px; }
+    .pipeline-bar { padding: 20px 28px; }
+  }
+
+  p { margin-bottom: 12px; }
+  p:last-child { margin-bottom: 0; }
+  ul { padding-left: 20px; color: var(--text2); font-size: 13px; }
+  ul li { margin-bottom: 6px; }
+  h3 { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 600; color: var(--text); margin: 20px 0 10px; }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+<!-- ─── SIDEBAR ─── -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="logo">
+      <div class="logo-icon">AF</div>
+      <div>
+        <div class="logo-text">AIF Handoff</div>
+        <div class="logo-sub">// docker guide</div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-label">Начало</div>
+      <a class="nav-item active" href="#prereq">
+        <span class="nav-dot"></span> Требования
+        <span class="nav-num">01</span>
+      </a>
+      <a class="nav-item" href="#clone">
+        <span class="nav-dot"></span> Клонирование
+        <span class="nav-num">02</span>
+      </a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Dev режим</div>
+      <a class="nav-item" href="#quickstart">
+        <span class="nav-dot"></span> Быстрый старт
+        <span class="nav-num">03</span>
+      </a>
+      <a class="nav-item" href="#auth">
+        <span class="nav-dot"></span> Авторизация
+        <span class="nav-num">04</span>
+      </a>
+      <a class="nav-item" href="#env">
+        <span class="nav-dot"></span> Переменные окружения
+        <span class="nav-num">05</span>
+      </a>
+      <a class="nav-item" href="#verify">
+        <span class="nav-dot"></span> Проверка
+        <span class="nav-num">06</span>
+      </a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Production</div>
+      <a class="nav-item" href="#production">
+        <span class="nav-dot"></span> Production запуск
+        <span class="nav-num">07</span>
+      </a>
+      <a class="nav-item" href="#prod-env">
+        <span class="nav-dot"></span> Production переменные
+        <span class="nav-num">08</span>
+      </a>
+      <a class="nav-item" href="#ssl">
+        <span class="nav-dot"></span> SSL / домен
+        <span class="nav-num">09</span>
+      </a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Управление</div>
+      <a class="nav-item" href="#commands">
+        <span class="nav-dot"></span> Команды Docker
+        <span class="nav-num">10</span>
+      </a>
+      <a class="nav-item" href="#volumes">
+        <span class="nav-dot"></span> Volumes и данные
+        <span class="nav-num">11</span>
+      </a>
+      <a class="nav-item" href="#troubleshoot">
+        <span class="nav-dot"></span> Устранение проблем
+        <span class="nav-num">12</span>
+      </a>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="status-pill">
+      <span class="status-dot"></span>
+      Docker · Linux / macOS / Win
+    </div>
+  </div>
+</aside>
+
+<!-- ─── MAIN ─── -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">// docker · containerized · production-ready</div>
+    <h1>AIF Handoff<br><span>Docker</span> Guide</h1>
+    <p class="hero-desc">
+      Полное руководство по запуску AIF Handoff в Docker — от быстрого старта в dev-режиме до production-деплоя с SSL, healthchecks и resource limits. Работает на Linux, macOS и Windows с Docker Desktop.
+    </p>
+    <div class="hero-meta">
+      <div class="meta-item">🐳 <strong>Docker Desktop</strong></div>
+      <div class="meta-item">🔑 <strong>Claude подписка или API Key</strong></div>
+      <div class="meta-item">🌿 <strong>Git</strong></div>
+    </div>
+  </div>
+
+  <!-- PIPELINE -->
+  <div class="pipeline-bar">
+    <div class="pipeline-label">Pipeline задач</div>
+    <div class="pipeline">
+      <div class="pipe-stage"><div class="pipe-box stage-backlog">Backlog</div><div class="pipe-label">human</div></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-stage"><div class="pipe-box stage-planning">Planning</div><div class="pipe-label">ai</div></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-stage"><div class="pipe-box stage-ready">Plan Ready</div><div class="pipe-label">ai + human</div></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-stage"><div class="pipe-box stage-impl">Implementing</div><div class="pipe-label">ai</div></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-stage"><div class="pipe-box stage-review">Review</div><div class="pipe-label">ai</div></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-stage"><div class="pipe-box stage-done">Done</div><div class="pipe-label">✓</div></div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ─── 01 PREREQUISITES ─── -->
+    <section class="section" id="prereq">
+      <div class="section-header">
+        <span class="section-num">01</span>
+        <div>
+          <div class="section-title">Требования</div>
+          <div class="section-desc">Что нужно установить перед началом</div>
+        </div>
+      </div>
+
+      <div class="cards">
+        <div class="card">
+          <div class="card-icon">🐳</div>
+          <div class="card-title">Docker Desktop</div>
+          <div class="card-desc">Docker Desktop для Windows/macOS или Docker Engine + Docker Compose для Linux. Версия с поддержкой compose v2.</div>
+        </div>
+        <div class="card">
+          <div class="card-icon">🔑</div>
+          <div class="card-title">Claude аккаунт</div>
+          <div class="card-desc">Подписка Claude (авторизация через <code>claude login</code> внутри контейнера) или Anthropic API Key.</div>
+        </div>
+        <div class="card">
+          <div class="card-icon">🌿</div>
+          <div class="card-title">Git</div>
+          <div class="card-desc">Для клонирования репозитория.</div>
+        </div>
+        <div class="card">
+          <div class="card-icon">🌐</div>
+          <div class="card-title">Домен (для production)</div>
+          <div class="card-desc">Только для production-деплоя с SSL. Для локального dev не нужен.</div>
+        </div>
+      </div>
+
+      <div class="callout docker">
+        <strong>Преимущество Docker:</strong> <span>Не нужно устанавливать Node.js или Claude CLI на хост-машину — всё изолировано внутри контейнеров. Данные сохраняются в Docker volumes и переживают перезапуски.</span>
+      </div>
+    </section>
+
+    <!-- ─── 02 CLONE ─── -->
+    <section class="section" id="clone">
+      <div class="section-header">
+        <span class="section-num">02</span>
+        <div>
+          <div class="section-title">Клонирование репозитория</div>
+          <div class="section-desc">Получить исходный код aif-handoff</div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="prompt">$</span> git clone https://github.com/lee-to/aif-handoff.git
+<span class="prompt">$</span> cd aif-handoff</pre></div>
+      </div>
+
+      <p style="font-size:13px; color:var(--text2);">Структура репозитория после клонирования:</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">tree</span></div>
+        <div class="code-body"><pre><span class="cv">aif-handoff/</span>
+├── <span class="cb">packages/</span>
+│   ├── <span class="ck">api/</span>        <span class="cm"># Hono REST + WebSocket  → :3009</span>
+│   ├── <span class="ck">web/</span>        <span class="cm"># React Kanban UI        → :5180</span>
+│   └── <span class="ck">agent/</span>      <span class="cm"># Координатор субагентов</span>
+├── <span class="cs">docker-compose.yml</span>             <span class="cm"># dev режим</span>
+├── <span class="cs">docker-compose.production.yml</span>  <span class="cm"># production</span>
+├── <span class="cs">.env.example</span>
+└── <span class="cs">package.json</span></pre></div>
+      </div>
+    </section>
+
+    <!-- ─── 03 QUICKSTART ─── -->
+    <section class="section" id="quickstart">
+      <div class="section-header">
+        <span class="section-num">03</span>
+        <div>
+          <div class="section-title">Быстрый старт (Dev режим)</div>
+          <div class="section-desc">Одна команда собирает и запускает все три сервиса</div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="prompt">$</span> docker compose up --build</pre></div>
+      </div>
+
+      <p style="font-size:13px; color:var(--text2); margin-bottom: 16px;">Эта команда собирает образы и запускает три сервиса:</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Сервис</th><th>URL</th><th>Описание</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>API</td>
+              <td><code>http://localhost:3009</code></td>
+              <td>Hono REST + WebSocket сервер</td>
+            </tr>
+            <tr>
+              <td>Web UI</td>
+              <td><code>http://localhost:5180</code></td>
+              <td>React Kanban-доска (Angie reverse proxy)</td>
+            </tr>
+            <tr>
+              <td>Agent</td>
+              <td><em>background</em></td>
+              <td>Координатор субагентов, polling каждые 30 сек</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout docker">
+        <strong>Reverse proxy:</strong> <span>Web UI на <code>localhost:5180</code> автоматически проксирует все API и WebSocket запросы через Angie — дополнительная настройка не нужна.</span>
+      </div>
+
+      <h3>Запуск в фоновом режиме</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="prompt">$</span> docker compose up --build -d   <span class="cm"># -d = detached (фон)</span>
+<span class="prompt">$</span> docker compose logs -f          <span class="cm"># просмотр логов</span></pre></div>
+      </div>
+    </section>
+
+    <!-- ─── 04 AUTH ─── -->
+    <section class="section" id="auth">
+      <div class="section-header">
+        <span class="section-num">04</span>
+        <div>
+          <div class="section-title">Авторизация Claude</div>
+          <div class="section-desc">Два способа — API Key или подписка Claude через OAuth</div>
+        </div>
+      </div>
+
+      <div class="auth-options">
+        <div class="auth-card option-a">
+          <div class="auth-card-label">Option A</div>
+          <div class="auth-card-title">🔑 API Key</div>
+          <div class="auth-card-desc">Создайте файл <code>.env</code> с API ключом до запуска контейнеров. Подходит для CI/CD и серверного деплоя.</div>
+        </div>
+        <div class="auth-card option-b">
+          <div class="auth-card-label">Option B</div>
+          <div class="auth-card-title">👤 Claude подписка</div>
+          <div class="auth-card-desc">Войдите через OAuth внутри контейнера после первого запуска. Credentials сохраняются в Docker volume.</div>
+        </div>
+      </div>
+
+      <h3>Option A — API Key</h3>
+      <p style="font-size:13px; color:var(--text2);">Создайте <code>.env</code> из примера и задайте ключ <strong>до</strong> запуска:</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="prompt">$</span> cp .env.example .env</pre></div>
+      </div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">.env</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="ck">ANTHROPIC_API_KEY</span>=<span class="cv">sk-ant-xxxxx</span></pre></div>
+      </div>
+
+      <h3>Option B — Claude подписка (OAuth)</h3>
+      <div class="steps">
+        <div class="step done">
+          <div class="step-indicator">
+            <div class="step-circle">1</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-title">Запустить контейнеры</div>
+            <div class="step-body">
+              <div class="code-block" style="margin: 0;">
+                <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+                <div class="code-body"><pre><span class="prompt">$</span> docker compose up --build -d</pre></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step done">
+          <div class="step-indicator">
+            <div class="step-circle">2</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-title">Войти в контейнер агента</div>
+            <div class="step-body">
+              <div class="code-block" style="margin: 0;">
+                <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+                <div class="code-body"><pre><span class="prompt">$</span> docker compose exec agent claude login</pre></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step done">
+          <div class="step-indicator">
+            <div class="step-circle">3</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-title">Открыть URL в браузере</div>
+            <div class="step-body">
+              Терминал выведет URL для авторизации. Скопируйте его <strong>полностью</strong> и откройте в браузере.
+              <div class="callout warning" style="margin-top: 12px;">
+                <strong>Важно:</strong> <span>Терминал может переносить длинный URL на несколько строк — удалите все переносы строк и пробелы перед вставкой, иначе OAuth завершится ошибкой <code>invalid code_challenge</code>.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step done">
+          <div class="step-indicator">
+            <div class="step-circle">4</div>
+          </div>
+          <div class="step-content">
+            <div class="step-title">Перезапустить контейнеры</div>
+            <div class="step-body">
+              <div class="code-block" style="margin: 0;">
+                <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+                <div class="code-body"><pre><span class="prompt">$</span> docker compose restart</pre></div>
+              </div>
+              <p style="margin-top: 10px;">Credentials сохраняются в Docker volume <code>claude-auth</code> и переживают все перезапуски.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── 05 ENV ─── -->
+    <section class="section" id="env">
+      <div class="section-header">
+        <span class="section-num">05</span>
+        <div>
+          <div class="section-title">Переменные окружения (Dev)</div>
+          <div class="section-desc">Docker-специфичные переменные для dev-режима</div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Переменная</th><th>По умолчанию</th><th>Описание</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>ANTHROPIC_API_KEY</td>
+              <td><span style="color:var(--text3)">—</span></td>
+              <td>API ключ. Если пусто — используется авторизация через <code>claude login</code></td>
+            </tr>
+            <tr>
+              <td>PORT</td>
+              <td><code>3009</code></td>
+              <td>Порт API-сервера на хосте</td>
+            </tr>
+            <tr>
+              <td>WEB_PORT</td>
+              <td><code>5180</code></td>
+              <td>Порт Web UI на хосте</td>
+            </tr>
+            <tr>
+              <td>PROJECTS_DIR</td>
+              <td><code>./projects</code></td>
+              <td>Директория на хосте для файлов проектов (bind mount)</td>
+            </tr>
+            <tr>
+              <td>PROJECTS_MOUNT</td>
+              <td><code>/home/www</code></td>
+              <td>Путь к файлам проектов внутри контейнеров</td>
+            </tr>
+            <tr>
+              <td>AGENT_USE_SUBAGENTS</td>
+              <td><code>true</code></td>
+              <td><code>true</code> — субагенты (качество), <code>false</code> — AIF-скиллы (скорость)</td>
+            </tr>
+            <tr>
+              <td>AGENT_BYPASS_PERMISSIONS</td>
+              <td><code>true</code></td>
+              <td>Разрешить агенту выполнять команды без подтверждения</td>
+            </tr>
+            <tr>
+              <td>POLL_INTERVAL_MS</td>
+              <td><code>30000</code></td>
+              <td>Интервал опроса задач координатором (мс)</td>
+            </tr>
+            <tr>
+              <td>LOG_LEVEL</td>
+              <td><code>debug</code></td>
+              <td>Уровень логов: <code>fatal</code> / <code>error</code> / <code>warn</code> / <code>info</code> / <code>debug</code> / <code>trace</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Пример минимального .env для Docker Dev</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">.env</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="cm"># Авторизация (один из вариантов)</span>
+<span class="cm"># ANTHROPIC_API_KEY=sk-ant-xxxxx</span>
+
+<span class="cm"># Порты</span>
+<span class="ck">PORT</span>=<span class="cv">3009</span>
+<span class="ck">WEB_PORT</span>=<span class="cv">5180</span>
+
+<span class="cm"># Проекты — путь к вашему коду на хосте</span>
+<span class="ck">PROJECTS_DIR</span>=<span class="cv">./projects</span>
+<span class="ck">PROJECTS_MOUNT</span>=<span class="cv">/home/www</span>
+
+<span class="cm"># Агент</span>
+<span class="ck">AGENT_BYPASS_PERMISSIONS</span>=<span class="cv">true</span>
+<span class="ck">POLL_INTERVAL_MS</span>=<span class="cv">30000</span></pre></div>
+      </div>
+    </section>
+
+    <!-- ─── 06 VERIFY ─── -->
+    <section class="section" id="verify">
+      <div class="section-header">
+        <span class="section-num">06</span>
+        <div>
+          <div class="section-title">Проверка работоспособности</div>
+          <div class="section-desc">Убедитесь что все сервисы запущены корректно</div>
+        </div>
+      </div>
+
+      <div class="steps">
+        <div class="step done">
+          <div class="step-indicator"><div class="step-circle">1</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Открыть Kanban UI</div>
+            <div class="step-body">Перейдите на <code>http://localhost:5180</code> — должна появиться Kanban-доска с колонками Backlog, Planning, Plan Ready, Implementing.</div>
+          </div>
+        </div>
+        <div class="step done">
+          <div class="step-indicator"><div class="step-circle">2</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Проверить readiness агента</div>
+            <div class="step-body">
+              <div class="code-block" style="margin: 0;">
+                <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+                <div class="code-body"><pre><span class="prompt">$</span> curl -s http://localhost:3009/agent/readiness</pre></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step done">
+          <div class="step-indicator"><div class="step-circle">3</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Проверить статус контейнеров</div>
+            <div class="step-body">
+              <div class="code-block" style="margin: 0;">
+                <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+                <div class="code-body"><pre><span class="prompt">$</span> docker compose ps</pre></div>
+              </div>
+              <p style="margin-top: 10px;">Все три сервиса (<code>api</code>, <code>web</code>, <code>agent</code>) должны иметь статус <span class="tag green">running</span>.</p>
+            </div>
+          </div>
+        </div>
+        <div class="step done">
+          <div class="step-indicator"><div class="step-circle">4</div></div>
+          <div class="step-content">
+            <div class="step-title">Создать проект и добавить задачу</div>
+            <div class="step-body">В UI создайте проект, укажите путь к коду (внутри контейнера это <code>/home/www/ваш-проект</code>). Добавьте задачу в Backlog — через ~30 сек агент начнёт её обрабатывать.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout success">
+        <strong>Признак успешного запуска:</strong> <span>В логах агента видны строки <code>"Agent coordinator is running"</code> и <code>"Poll cycle complete"</code> каждые 30 секунд.</span>
+      </div>
+    </section>
+
+    <!-- ─── 07 PRODUCTION ─── -->
+    <section class="section" id="production">
+      <div class="section-header">
+        <span class="section-num">07</span>
+        <div>
+          <div class="section-title">Production запуск</div>
+          <div class="section-desc">Отдельный compose-файл с усиленной безопасностью и healthchecks</div>
+        </div>
+      </div>
+
+      <div class="callout docker">
+        <strong>Production включает:</strong> <span>только порты 80/443, security hardening, healthchecks, resource limits и log rotation. Авторизация работает так же как в dev.</span>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="prompt">$</span> docker compose -f docker-compose.production.yml up --build</pre></div>
+      </div>
+
+      <p style="font-size:13px; color:var(--text2);">В фоновом режиме:</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="prompt">$</span> docker compose -f docker-compose.production.yml up --build -d</pre></div>
+      </div>
+
+      <h3>Авторизация в production</h3>
+      <p style="font-size:13px; color:var(--text2);">Работает так же как в dev — два варианта:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash — Option B (подписка)</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="prompt">$</span> docker compose -f docker-compose.production.yml exec agent claude login
+<span class="prompt">$</span> docker compose -f docker-compose.production.yml restart</pre></div>
+      </div>
+    </section>
+
+    <!-- ─── 08 PROD ENV ─── -->
+    <section class="section" id="prod-env">
+      <div class="section-header">
+        <span class="section-num">08</span>
+        <div>
+          <div class="section-title">Production переменные окружения</div>
+          <div class="section-desc">Дополнительные переменные специфичные для production</div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Переменная</th><th>По умолчанию</th><th>Описание</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>DOMAIN</td>
+              <td><code>localhost</code></td>
+              <td>Домен для SSL сертификата (Let's Encrypt через ACME)</td>
+            </tr>
+            <tr>
+              <td>HTTP_PORT</td>
+              <td><code>80</code></td>
+              <td>Порт HTTP для Web UI (production)</td>
+            </tr>
+            <tr>
+              <td>HTTPS_PORT</td>
+              <td><code>443</code></td>
+              <td>Порт HTTPS (production)</td>
+            </tr>
+            <tr>
+              <td>ANTHROPIC_API_KEY</td>
+              <td><span style="color:var(--text3)">—</span></td>
+              <td>API ключ (или использовать <code>claude login</code>)</td>
+            </tr>
+            <tr>
+              <td>PROJECTS_DIR</td>
+              <td><code>./projects</code></td>
+              <td>Путь к проектам на хосте</td>
+            </tr>
+            <tr>
+              <td>PROJECTS_MOUNT</td>
+              <td><code>/home/www</code></td>
+              <td>Путь внутри контейнеров</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Пример .env для production</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">.env</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="cm"># Авторизация</span>
+<span class="ck">ANTHROPIC_API_KEY</span>=<span class="cv">sk-ant-xxxxx</span>   <span class="cm"># или оставить пустым + claude login</span>
+
+<span class="cm"># Домен и SSL</span>
+<span class="ck">DOMAIN</span>=<span class="cv">handoff.example.com</span>
+
+<span class="cm"># Production порты</span>
+<span class="ck">HTTP_PORT</span>=<span class="cv">80</span>
+<span class="ck">HTTPS_PORT</span>=<span class="cv">443</span>
+
+<span class="cm"># Проекты</span>
+<span class="ck">PROJECTS_DIR</span>=<span class="cv">/var/projects</span>
+<span class="ck">PROJECTS_MOUNT</span>=<span class="cv">/home/www</span>
+
+<span class="cm"># Агент</span>
+<span class="ck">AGENT_BYPASS_PERMISSIONS</span>=<span class="cv">true</span>
+<span class="ck">LOG_LEVEL</span>=<span class="cv">info</span>   <span class="cm"># в production лучше info вместо debug</span></pre></div>
+      </div>
+    </section>
+
+    <!-- ─── 09 SSL ─── -->
+    <section class="section" id="ssl">
+      <div class="section-header">
+        <span class="section-num">09</span>
+        <div>
+          <div class="section-title">SSL и домен</div>
+          <div class="section-desc">Автоматический SSL через Let's Encrypt (ACME)</div>
+        </div>
+      </div>
+
+      <div class="checklist">
+        <div class="check-item">
+          <div class="check-icon info">1</div>
+          <span>Укажите ваш домен в <code>DOMAIN=handoff.example.com</code> в <code>.env</code></span>
+        </div>
+        <div class="check-item">
+          <div class="check-icon info">2</div>
+          <span>Убедитесь что DNS A-запись домена указывает на IP сервера</span>
+        </div>
+        <div class="check-item">
+          <div class="check-icon info">3</div>
+          <span>Порты 80 и 443 должны быть открыты в firewall сервера</span>
+        </div>
+        <div class="check-item">
+          <div class="check-icon info">4</div>
+          <span>Запустите production compose — Angie автоматически получит и обновит сертификат через ACME</span>
+        </div>
+        <div class="check-item">
+          <div class="check-icon ok">✓</div>
+          <span>Сертификат хранится в Docker volume и переживает перезапуски контейнеров</span>
+        </div>
+      </div>
+
+      <div class="callout warning">
+        <strong>Локальная разработка:</strong> <span>Для dev оставьте <code>DOMAIN=localhost</code> — SSL не нужен, приложение доступно по HTTP на порту <code>5180</code>.</span>
+      </div>
+    </section>
+
+    <!-- ─── 10 COMMANDS ─── -->
+    <section class="section" id="commands">
+      <div class="section-header">
+        <span class="section-num">10</span>
+        <div>
+          <div class="section-title">Полезные команды Docker</div>
+          <div class="section-desc">Управление контейнерами в процессе работы</div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash — основные команды</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="cm"># Запуск (сборка + старт)</span>
+<span class="prompt">$</span> docker compose up --build
+
+<span class="cm"># Запуск в фоне</span>
+<span class="prompt">$</span> docker compose up --build -d
+
+<span class="cm"># Остановка</span>
+<span class="prompt">$</span> docker compose down
+
+<span class="cm"># Перезапуск</span>
+<span class="prompt">$</span> docker compose restart
+
+<span class="cm"># Статус контейнеров</span>
+<span class="prompt">$</span> docker compose ps
+
+<span class="cm"># Логи всех сервисов</span>
+<span class="prompt">$</span> docker compose logs -f
+
+<span class="cm"># Логи конкретного сервиса</span>
+<span class="prompt">$</span> docker compose logs -f agent
+<span class="prompt">$</span> docker compose logs -f api
+<span class="prompt">$</span> docker compose logs -f web
+
+<span class="cm"># Войти в контейнер агента</span>
+<span class="prompt">$</span> docker compose exec agent sh
+
+<span class="cm"># Пересобрать без кэша</span>
+<span class="prompt">$</span> docker compose build --no-cache</pre></div>
+      </div>
+    </section>
+
+    <!-- ─── 11 VOLUMES ─── -->
+    <section class="section" id="volumes">
+      <div class="section-header">
+        <span class="section-num">11</span>
+        <div>
+          <div class="section-title">Volumes и персистентность данных</div>
+          <div class="section-desc">Что сохраняется между перезапусками контейнеров</div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Volume</th><th>Содержимое</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>claude-auth</td>
+              <td>Credentials от <code>claude login</code> — переживает все перезапуски</td>
+            </tr>
+            <tr>
+              <td>aif-data</td>
+              <td>SQLite база данных с задачами, проектами, историей</td>
+            </tr>
+            <tr>
+              <td>projects (bind mount)</td>
+              <td>Файлы проектов с хост-машины — монтируется из <code>PROJECTS_DIR</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Подключение вашего проекта</h3>
+      <p style="font-size:13px; color:var(--text2);">Чтобы агент работал с кодом на вашей машине, укажите путь в <code>.env</code>:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">.env</span>
+          <button class="copy-btn" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="code-body"><pre><span class="cm"># Linux / macOS</span>
+<span class="ck">PROJECTS_DIR</span>=<span class="cv">/home/user/my-project</span>
+<span class="ck">PROJECTS_MOUNT</span>=<span class="cv">/home/www</span>
+
+<span class="cm"># Windows</span>
+<span class="ck">PROJECTS_DIR</span>=<span class="cv">C:/automost</span>
+<span class="ck">PROJECTS_MOUNT</span>=<span class="cv">/home/www</span></pre></div>
+      </div>
+
+      <p style="font-size:13px; color:var(--text2);">В UI при создании проекта укажите <strong>Root Path</strong> = <code>/home/www</code> (путь внутри контейнера).</p>
+
+      <div class="callout warning">
+        <strong>Удаление volumes:</strong> <span>При <code>docker compose down -v</code> все volumes удаляются включая базу данных и credentials. Используйте просто <code>docker compose down</code> для остановки без удаления данных.</span>
+      </div>
+    </section>
+
+    <!-- ─── 12 TROUBLESHOOT ─── -->
+    <section class="section" id="troubleshoot">
+      <div class="section-header">
+        <span class="section-num">12</span>
+        <div>
+          <div class="section-title">Устранение проблем</div>
+          <div class="section-desc">Типичные ошибки при работе с Docker</div>
+        </div>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-indicator"><div class="step-circle">!</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Контейнер не запускается — порт занят</div>
+            <div class="step-body">
+              Измените порты в <code>.env</code>:
+              <div class="code-block" style="margin-top: 10px;">
+                <div class="code-header"><span class="code-lang">.env</span></div>
+                <div class="code-body"><pre><span class="ck">PORT</span>=<span class="cv">3010</span>
+<span class="ck">WEB_PORT</span>=<span class="cv">5181</span></pre></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-indicator"><div class="step-circle">!</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Агент не видит credentials после claude login</div>
+            <div class="step-body">
+              Обязательно перезапустите контейнеры после авторизации:
+              <div class="code-block" style="margin-top: 10px;">
+                <div class="code-header"><span class="code-lang">bash</span></div>
+                <div class="code-body"><pre><span class="prompt">$</span> docker compose restart</pre></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-indicator"><div class="step-circle">!</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">OAuth ошибка invalid code_challenge</div>
+            <div class="step-body">URL из терминала перенёсся на несколько строк. Скопируйте его целиком, удалите все переносы строк и пробелы, затем вставьте в браузер.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-indicator"><div class="step-circle">!</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Агент зависает или таймаутится</div>
+            <div class="step-body">
+              Отключите субагентов в <code>.env</code>:
+              <div class="code-block" style="margin-top: 10px;">
+                <div class="code-header"><span class="code-lang">.env</span></div>
+                <div class="code-body"><pre><span class="ck">AGENT_USE_SUBAGENTS</span>=<span class="cv">false</span></pre></div>
+              </div>
+              Перезапустите: <code>docker compose restart</code>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-indicator"><div class="step-circle">!</div><div class="step-line"></div></div>
+          <div class="step-content">
+            <div class="step-title">Агент сообщает об отсутствии прав</div>
+            <div class="step-body">
+              Проверьте что в <code>.env</code> установлено:
+              <div class="code-block" style="margin-top: 10px;">
+                <div class="code-header"><span class="code-lang">.env</span></div>
+                <div class="code-body"><pre><span class="ck">AGENT_BYPASS_PERMISSIONS</span>=<span class="cv">true</span></pre></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-indicator"><div class="step-circle">!</div></div>
+          <div class="step-content">
+            <div class="step-title">Полный сброс и чистый старт</div>
+            <div class="step-body">
+              <div class="code-block" style="margin-top: 0;">
+                <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+                <div class="code-body"><pre><span class="prompt">$</span> docker compose down          <span class="cm"># остановить (данные сохранятся)</span>
+<span class="prompt">$</span> docker compose down -v        <span class="cm"># остановить + удалить volumes (данные потеряются)</span>
+<span class="prompt">$</span> docker compose build --no-cache <span class="cm"># пересобрать образы</span>
+<span class="prompt">$</span> docker compose up --build     <span class="cm"># запустить заново</span></pre></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout success" style="margin-top: 24px;">
+        <strong>Всё готово!</strong> <span>Web UI на <code>:5180</code> · API на <code>:3009</code> · Agent в контейнере · Данные в Docker volumes. Добавляйте задачи в Backlog и наблюдайте как агент проводит их через все стадии автономно.</span>
+      </div>
+    </section>
+
+  </div>
+</main>
+</div>
+
+<script>
+  function copyCode(btn) {
+    const pre = btn.closest('.code-block').querySelector('pre');
+    const text = pre.innerText.replace(/^\$\s*/gm, '').replace(/^#.*$/gm, '').trim();
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+
+  const sections = document.querySelectorAll('.section');
+  const navItems = document.querySelectorAll('.nav-item');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navItems.forEach(item => item.classList.remove('active'));
+        const id = entry.target.id;
+        const active = document.querySelector(`.nav-item[href="#${id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { threshold: 0.3 });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
