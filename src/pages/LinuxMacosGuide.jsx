@@ -84,15 +84,15 @@ export default function LinuxMacosGuide() {
             <button className="text-xs text-gray-500 hover:text-green-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300 whitespace-pre-wrap break-words">
-<span className="text-gray-600">{t('# NodeSource репозиторий для Node.js 22', '# NodeSource repository for Node.js 22')}</span>
-<span className="text-green-400">$</span> curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
-<span className="text-green-400">$</span> sudo apt-get install -y nodejs
-
-<span className="text-gray-600">{t('# Проверка версии', '# Verify the version')}</span>
-<span className="text-green-400">$</span> node --version  <span className="text-gray-600">{t('# должно быть v22.x.x', '# should be v22.x.x')}</span>
-<span className="text-green-400">$</span> npm --version   <span className="text-gray-600">{t('# должно быть 10.x.x+', '# should be 10.x.x+')}</span>
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p className="text-gray-600">{t('# NodeSource репозиторий для Node.js 22', '# NodeSource repository for Node.js 22')}</p>
+              <p><span className="text-green-400">$</span> curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -</p>
+              <p><span className="text-green-400">$</span> sudo apt-get install -y nodejs</p>
+              <p className="h-2" />
+              <p className="text-gray-600">{t('# Проверка версии', '# Verify the version')}</p>
+              <p><span className="text-green-400">$</span> node --version  <span className="text-gray-600">{t('# должно быть v22.x.x', '# should be v22.x.x')}</span></p>
+              <p><span className="text-green-400">$</span> npm --version   <span className="text-gray-600">{t('# должно быть 10.x.x+', '# should be 10.x.x+')}</span></p>
+            </div>
           </div>
         </div>
 
@@ -104,15 +104,15 @@ export default function LinuxMacosGuide() {
             <button className="text-xs text-gray-500 hover:text-green-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300 whitespace-pre-wrap break-words">
-<span className="text-gray-600">{t('# Установить Node.js через Homebrew', '# Install Node.js via Homebrew')}</span>
-<span className="text-green-400">$</span> brew install node@22
-
-<span className="text-gray-600">{t('# Или использовать nvm (рекомендуется)', '# Or use nvm (recommended)')}</span>
-<span className="text-green-400">$</span> curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash
-<span className="text-green-400">$</span> nvm install 22
-<span className="text-green-400">$</span> nvm use 22
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p className="text-gray-600">{t('# Установить Node.js через Homebrew', '# Install Node.js via Homebrew')}</p>
+              <p><span className="text-green-400">$</span> brew install node@22</p>
+              <p className="h-2" />
+              <p className="text-gray-600">{t('# Или использовать nvm (рекомендуется)', '# Or use nvm (recommended)')}</p>
+              <p><span className="text-green-400">$</span> curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash</p>
+              <p><span className="text-green-400">$</span> nvm install 22</p>
+              <p><span className="text-green-400">$</span> nvm use 22</p>
+            </div>
           </div>
         </div>
 
@@ -124,13 +124,13 @@ export default function LinuxMacosGuide() {
             <button className="text-xs text-gray-500 hover:text-green-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300">
-<span className="text-green-400">$</span> node --version
-v22.18.0
-
-<span className="text-green-400">$</span> npm --version
-10.8.1
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-green-400">$</span> node --version</p>
+              <p>v22.18.0</p>
+              <p className="h-2" />
+              <p><span className="text-green-400">$</span> npm --version</p>
+              <p>10.8.1</p>
+            </div>
           </div>
         </div>
       </section>
@@ -151,10 +151,10 @@ v22.18.0
             <button className="text-xs text-gray-500 hover:text-green-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300">
-<span className="text-green-400">$</span> npm install -g @anthropic-ai/sdk-cli
-<span className="text-green-400">$</span> claude --version
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-green-400">$</span> npm install -g @anthropic-ai/sdk-cli</p>
+              <p><span className="text-green-400">$</span> claude --version</p>
+            </div>
           </div>
         </div>
 
@@ -172,8 +172,8 @@ v22.18.0
             <button className="text-xs text-gray-500 hover:text-green-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300 whitespace-pre-wrap break-words">
-{t(
+            <div className="text-gray-300 space-y-1 break-words">
+              {t(
 `# Создать глобальную директорию npm в HOME
 $ mkdir -p ~/.npm-global
 $ npm config set prefix '~/.npm-global'
@@ -202,8 +202,12 @@ $ source ~/.zshrc
 
 # Now install the Claude CLI
 $ npm install -g @anthropic-ai/sdk-cli`
-)}
-            </pre>
+              ).split('\n').map((line, i) => (
+                line === '' ? <p key={i} className="h-2" /> :
+                line.startsWith('#') ? <p key={i} className="text-gray-600">{line}</p> :
+                <p key={i}>{line}</p>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -224,10 +228,10 @@ $ npm install -g @anthropic-ai/sdk-cli`
             <button className="text-xs text-gray-500 hover:text-green-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300">
-<span className="text-green-400">$</span> git clone https://github.com/lee-to/aif-handoff.git
-<span className="text-green-400">$</span> cd aif-handoff
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-green-400">$</span> git clone https://github.com/lee-to/aif-handoff.git</p>
+              <p><span className="text-green-400">$</span> cd aif-handoff</p>
+            </div>
           </div>
         </div>
       </section>
@@ -248,9 +252,9 @@ $ npm install -g @anthropic-ai/sdk-cli`
             <button className="text-xs text-gray-500 hover:text-green-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300">
-<span className="text-green-400">$</span> npm install
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-green-400">$</span> npm install</p>
+            </div>
           </div>
         </div>
 
@@ -290,11 +294,11 @@ $ npm install -g @anthropic-ai/sdk-cli`
             <button className="text-xs text-gray-500 hover:text-green-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300">
-<span className="text-green-400">$</span> npm run init
-<span className="text-gray-600">{t('# Создаёт: ./data/aif.sqlite', '# Creates: ./data/aif.sqlite')}</span>
-<span className="text-gray-600">{t('# Применяет все миграции (11 штук)', '# Applies all migrations (11 total)')}</span>
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-green-400">$</span> npm run init</p>
+              <p className="text-gray-600">{t('# Создаёт: ./data/aif.sqlite', '# Creates: ./data/aif.sqlite')}</p>
+              <p className="text-gray-600">{t('# Применяет все миграции (11 штук)', '# Applies all migrations (11 total)')}</p>
+            </div>
           </div>
         </div>
 
@@ -305,11 +309,11 @@ $ npm install -g @anthropic-ai/sdk-cli`
             <span className="text-xs text-gray-500 uppercase tracking-wide">log</span>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-green-400">
-<span className="text-gray-300">{`{"msg":"Migrations complete","newVersion":11}`}</span>
-<span className="text-gray-300">{`{"msg":"Index bootstrap complete","indexCount":16}`}</span>
-<span className="text-gray-300">{`{"msg":"Database connection closed"}`}</span>
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p>{`{"msg":"Migrations complete","newVersion":11}`}</p>
+              <p>{`{"msg":"Index bootstrap complete","indexCount":16}`}</p>
+              <p>{`{"msg":"Database connection closed"}`}</p>
+            </div>
           </div>
         </div>
 
@@ -321,9 +325,9 @@ $ npm install -g @anthropic-ai/sdk-cli`
             <button className="text-xs text-gray-500 hover:text-green-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300">
-<span className="text-green-400">$</span> npm run db:push
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-green-400">$</span> npm run db:push</p>
+            </div>
           </div>
         </div>
       </section>
@@ -344,9 +348,9 @@ $ npm install -g @anthropic-ai/sdk-cli`
             <button className="text-xs text-gray-500 hover:text-green-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300">
-<span className="text-green-400">$</span> cp .env.example .env
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-green-400">$</span> cp .env.example .env</p>
+            </div>
           </div>
         </div>
 
@@ -388,18 +392,18 @@ $ npm install -g @anthropic-ai/sdk-cli`
             <button className="text-xs text-gray-500 hover:text-green-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300 whitespace-pre-wrap break-words">
-<span className="text-gray-600">{t('# Авторизация (оставить пустым если claude login)', '# Auth (leave empty if using claude login)')}</span>
-<span className="text-gray-600"># ANTHROPIC_API_KEY=sk-ant-xxxxx</span>
-
-<span className="text-purple-400">PORT</span>=<span className="text-green-400">3009</span>
-<span className="text-purple-400">WEB_PORT</span>=<span className="text-green-400">5180</span>
-<span className="text-purple-400">DATABASE_URL</span>=<span className="text-green-400">./data/aif.sqlite</span>
-
-<span className="text-purple-400">AGENT_BYPASS_PERMISSIONS</span>=<span className="text-green-400">true</span>
-<span className="text-purple-400">POLL_INTERVAL_MS</span>=<span className="text-green-400">30000</span>
-<span className="text-purple-400">LOG_LEVEL</span>=<span className="text-green-400">debug</span>
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p className="text-gray-600">{t('# Авторизация (оставить пустым если claude login)', '# Auth (leave empty if using claude login)')}</p>
+              <p className="text-gray-600"># ANTHROPIC_API_KEY=sk-ant-xxxxx</p>
+              <p className="h-2" />
+              <p><span className="text-purple-400">PORT</span>=<span className="text-green-400">3009</span></p>
+              <p><span className="text-purple-400">WEB_PORT</span>=<span className="text-green-400">5180</span></p>
+              <p><span className="text-purple-400">DATABASE_URL</span>=<span className="text-green-400">./data/aif.sqlite</span></p>
+              <p className="h-2" />
+              <p><span className="text-purple-400">AGENT_BYPASS_PERMISSIONS</span>=<span className="text-green-400">true</span></p>
+              <p><span className="text-purple-400">POLL_INTERVAL_MS</span>=<span className="text-green-400">30000</span></p>
+              <p><span className="text-purple-400">LOG_LEVEL</span>=<span className="text-green-400">debug</span></p>
+            </div>
           </div>
         </div>
       </section>
@@ -422,9 +426,9 @@ $ npm install -g @anthropic-ai/sdk-cli`
             <button className="text-xs text-gray-500 hover:text-green-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300">
-<span className="text-green-400">$</span> claude login
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-green-400">$</span> claude login</p>
+            </div>
           </div>
         </div>
 
@@ -448,9 +452,9 @@ $ npm install -g @anthropic-ai/sdk-cli`
             <button className="text-xs text-gray-500 hover:text-green-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300">
-<span className="text-purple-400">ANTHROPIC_API_KEY</span>=<span className="text-green-400">sk-ant-xxxxx</span>
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-purple-400">ANTHROPIC_API_KEY</span>=<span className="text-green-400">sk-ant-xxxxx</span></p>
+            </div>
           </div>
         </div>
 
@@ -462,12 +466,12 @@ $ npm install -g @anthropic-ai/sdk-cli`
             <button className="text-xs text-gray-500 hover:text-green-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300">
-<span className="text-green-400">$</span> ls ~/.claude/
-<span className="text-gray-600">{t('# Должен быть файл .credentials.json', '# There should be a .credentials.json file')}</span>
-
-<span className="text-green-400">$</span> test -f ~/.claude/.credentials.json && echo "OK" || echo "NOT FOUND"
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-green-400">$</span> ls ~/.claude/</p>
+              <p className="text-gray-600">{t('# Должен быть файл .credentials.json', '# There should be a .credentials.json file')}</p>
+              <p className="h-2" />
+              <p><span className="text-green-400">$</span> test -f ~/.claude/.credentials.json && echo "OK" || echo "NOT FOUND"</p>
+            </div>
           </div>
         </div>
       </section>
@@ -488,9 +492,9 @@ $ npm install -g @anthropic-ai/sdk-cli`
             <button className="text-xs text-gray-500 hover:text-green-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300">
-<span className="text-green-400">$</span> npm run dev
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-green-400">$</span> npm run dev</p>
+            </div>
           </div>
         </div>
 
@@ -530,12 +534,12 @@ $ npm install -g @anthropic-ai/sdk-cli`
             <span className="text-xs text-gray-500 uppercase tracking-wide">log</span>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-xs">
-            <pre className="text-gray-300 whitespace-pre-wrap break-words">
-<span className="text-amber-400">@aif/web:dev:</span>   <span className="text-green-400">➜  Local:   http://localhost:5180/</span>
-<span className="text-amber-400">@aif/api:dev:</span>   <span className="text-green-400">{`{"msg":"API server started","port":3009}`}</span>
-<span className="text-amber-400">@aif/agent:dev:</span> <span className="text-green-400">{`{"msg":"Agent coordinator is running"}`}</span>
-<span className="text-amber-400">@aif/agent:dev:</span> <span className="text-green-400">{`{"msg":"Poll cycle complete"}`}</span>  <span className="text-gray-600">{t('← каждые 30 сек', '← every 30 seconds')}</span>
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-amber-400">@aif/web:dev:</span>   <span className="text-green-400">➜  Local:   http://localhost:5180/</span></p>
+              <p><span className="text-amber-400">@aif/api:dev:</span>   <span className="text-green-400">{`{"msg":"API server started","port":3009}`}</span></p>
+              <p><span className="text-amber-400">@aif/agent:dev:</span> <span className="text-green-400">{`{"msg":"Agent coordinator is running"}`}</span></p>
+              <p><span className="text-amber-400">@aif/agent:dev:</span> <span className="text-green-400">{`{"msg":"Poll cycle complete"}`}</span>  <span className="text-gray-600">{t('← каждые 30 сек', '← every 30 seconds')}</span></p>
+            </div>
           </div>
         </div>
 
@@ -547,9 +551,9 @@ $ npm install -g @anthropic-ai/sdk-cli`
             <button className="text-xs text-gray-500 hover:text-green-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300">
-<span className="text-green-400">$</span> curl -s http://localhost:3009/agent/readiness
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-green-400">$</span> curl -s http://localhost:3009/agent/readiness</p>
+            </div>
           </div>
         </div>
       </section>
