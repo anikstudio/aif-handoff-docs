@@ -34,11 +34,10 @@ export default function WindowsGuide() {
         <div className="flex flex-wrap gap-3 items-center">
           {['Backlog', 'Planning', 'Plan Ready', 'Implementing', 'Review', 'Done'].map((stage, idx) => (
             <div key={idx} className="flex items-center gap-3">
-              <div className={`px-3 py-1.5 rounded text-xs font-semibold border ${
-                stage === 'Done' ? 'bg-green-500/20 border-green-500/50 text-green-400' :
+              <div className={`px-3 py-1.5 rounded text-xs font-semibold border ${stage === 'Done' ? 'bg-green-500/20 border-green-500/50 text-green-400' :
                 stage === 'Backlog' ? 'bg-gray-500/20 border-gray-500/50 text-gray-400' :
-                'bg-amber-500/20 border-amber-500/50 text-amber-400'
-              }`}>
+                  'bg-amber-500/20 border-amber-500/50 text-amber-400'
+                }`}>
                 {stage}
               </div>
               {idx < 5 && <div className="text-gray-500">→</div>}
@@ -95,15 +94,15 @@ export default function WindowsGuide() {
             <button className="text-xs text-gray-500 hover:text-green-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300 whitespace-pre-wrap break-words">
-<span className="text-green-400">PS&gt;</span> claude --version
-<span className="text-gray-600">{t('# Ожидаемый вывод:', '# Expected output:')}</span>
-<span className="text-green-400">2.1.77 (Claude Code)</span>
-
-<span className="text-green-400">PS&gt;</span> Get-Command claude
-<span className="text-gray-600">{t('# Покажет путь к claude.ps1', '# Shows the path to claude.ps1')}</span>
-<span className="text-green-400">ExternalScript  claude.ps1  C:\Users\...\AppData\Local\nvm\nodejs\claude.ps1</span>
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-green-400">PS&gt;</span> claude --version</p>
+              <p className="text-gray-600">{t('# Ожидаемый вывод:', '# Expected output:')}</p>
+              <p className="text-green-400">2.1.77 (Claude Code)</p>
+              <p className="h-2" />
+              <p><span className="text-green-400">PS&gt;</span> Get-Command claude</p>
+              <p className="text-gray-600">{t('# Покажет путь к claude.ps1', '# Shows the path to claude.ps1')}</p>
+              <p className="text-green-400">ExternalScript  claude.ps1  C:\Users\...\AppData\Local\nvm\nodejs\claude.ps1</p>
+            </div>
           </div>
         </div>
 
@@ -115,11 +114,11 @@ export default function WindowsGuide() {
             <button className="text-xs text-gray-500 hover:text-green-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300">
-<span className="text-green-400">PS&gt;</span> npm list -g --depth=0 | Select-String "claude-code"
-<span className="text-gray-600">{t('# Ожидаемый вывод:', '# Expected output:')}</span>
-<span className="text-green-400">+-- @anthropic-ai/claude-code@2.1.77</span>
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-green-400">PS&gt;</span> npm list -g --depth=0 | Select-String "claude-code"</p>
+              <p className="text-gray-600">{t('# Ожидаемый вывод:', '# Expected output:')}</p>
+              <p className="text-green-400">+-- @anthropic-ai/claude-code@2.1.77</p>
+            </div>
           </div>
         </div>
 
@@ -131,14 +130,14 @@ export default function WindowsGuide() {
             <button className="text-xs text-gray-500 hover:text-green-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300 whitespace-pre-wrap break-words">
-<span className="text-green-400">PS&gt;</span> ls $env:USERPROFILE\.claude\
-<span className="text-gray-600">{t('# Должны быть файл .credentials.json и папки sessions/, cache/ и др.', '# You should see a .credentials.json file plus sessions/, cache/ and other folders')}</span>
-
-<span className="text-green-400">PS&gt;</span> Test-Path "$env:USERPROFILE\.claude\.credentials.json"
-<span className="text-green-400">True</span>  <span className="text-gray-600">{t('# OK — авторизован', '# OK — authenticated')}</span>
-<span className="text-red-400">False</span> <span className="text-gray-600">{t('# Нужна авторизация: claude login', '# Needs authentication: claude login')}</span>
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-green-400">PS&gt;</span> ls $env:USERPROFILE\.claude\</p>
+              <p className="text-gray-600">{t('# Должны быть файл .credentials.json и папки sessions/, cache/ и др.', '# You should see a .credentials.json file plus sessions/, cache/ and other folders')}</p>
+              <p className="h-2" />
+              <p><span className="text-green-400">PS&gt;</span> Test-Path "$env:USERPROFILE\.claude\.credentials.json"</p>
+              <p><span className="text-green-400">True</span> <span className="text-gray-600">{t('# OK — авторизован', '# OK — authenticated')}</span></p>
+              <p><span className="text-red-400">False</span> <span className="text-gray-600">{t('# Нужна авторизация: claude login', '# Needs authentication: claude login')}</span></p>
+            </div>
           </div>
         </div>
 
@@ -167,11 +166,11 @@ export default function WindowsGuide() {
             <button className="text-xs text-gray-500 hover:text-green-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300">
-<span className="text-green-400">PS&gt;</span> cd C:\
-<span className="text-green-400">PS&gt;</span> git clone https://github.com/lee-to/aif-handoff.git
-<span className="text-green-400">PS&gt;</span> cd aif-handoff
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-green-400">PS&gt;</span> cd C:\</p>
+              <p><span className="text-green-400">PS&gt;</span> git clone https://github.com/lee-to/aif-handoff.git</p>
+              <p><span className="text-green-400">PS&gt;</span> cd aif-handoff</p>
+            </div>
           </div>
         </div>
       </section>
@@ -192,9 +191,9 @@ export default function WindowsGuide() {
             <button className="text-xs text-gray-500 hover:text-green-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300">
-<span className="text-green-400">PS C:\aif-handoff&gt;</span> npm install
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-green-400">PS C:\aif-handoff&gt;</span> npm install</p>
+            </div>
           </div>
         </div>
 
@@ -205,11 +204,10 @@ export default function WindowsGuide() {
             { icon: '✓', text: t('После установки должно появиться added N packages — всё нормально', 'After install you should see "added N packages" — that is expected') }
           ].map((item, idx) => (
             <div key={idx} className="flex gap-3 text-sm">
-              <div className={`w-5 h-5 rounded flex items-center justify-center flex-shrink-0 text-xs font-bold ${
-                item.icon === '!'
-                  ? 'bg-amber-500/20 border border-amber-500/50 text-amber-400'
-                  : 'bg-green-500/20 border border-green-500/50 text-green-400'
-              }`}>
+              <div className={`w-5 h-5 rounded flex items-center justify-center flex-shrink-0 text-xs font-bold ${item.icon === '!'
+                ? 'bg-amber-500/20 border border-amber-500/50 text-amber-400'
+                : 'bg-green-500/20 border border-green-500/50 text-green-400'
+                }`}>
                 {item.icon}
               </div>
               <div className="text-gray-400">{item.text}</div>
@@ -234,11 +232,11 @@ export default function WindowsGuide() {
             <button className="text-xs text-gray-500 hover:text-green-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300">
-<span className="text-green-400">PS C:\aif-handoff&gt;</span> npm run init
-<span className="text-gray-600">{t('# Выполняет npm run db:setup внутри @aif/shared', '# Runs npm run db:setup inside @aif/shared')}</span>
-<span className="text-gray-600">{t('# Создаёт: C:\\aif-handoff\\data\\aif.sqlite', '# Creates: C:\\aif-handoff\\data\\aif.sqlite')}</span>
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-green-400">PS C:\aif-handoff&gt;</span> npm run init</p>
+              <p className="text-gray-600">{t('# Выполняет npm run db:setup внутри @aif/shared', '# Runs npm run db:setup inside @aif/shared')}</p>
+              <p className="text-gray-600">{t('# Создаёт: C:\\aif-handoff\\data\\aif.sqlite', '# Creates: C:\\aif-handoff\\data\\aif.sqlite')}</p>
+            </div>
           </div>
         </div>
 
@@ -250,10 +248,10 @@ export default function WindowsGuide() {
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
             <pre className="text-green-400">
-{`{"msg":"Running database migrations"}`}
-{`{"msg":"Migrations complete","newVersion":11}`}
-{`{"msg":"Index bootstrap complete","indexCount":16}`}
-{`{"msg":"Database connection closed"}`}
+              {`{"msg":"Running database migrations"}`}
+              {`{"msg":"Migrations complete","newVersion":11}`}
+              {`{"msg":"Index bootstrap complete","indexCount":16}`}
+              {`{"msg":"Database connection closed"}`}
             </pre>
           </div>
         </div>
@@ -279,10 +277,10 @@ export default function WindowsGuide() {
             <button className="text-xs text-gray-500 hover:text-green-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300">
-<span className="text-green-400">PS C:\aif-handoff&gt;</span> copy .env.example .env
-<span className="text-green-400">PS C:\aif-handoff&gt;</span> notepad .env
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-green-400">PS C:\aif-handoff&gt;</span> copy .env.example .env</p>
+              <p><span className="text-green-400">PS C:\aif-handoff&gt;</span> notepad .env</p>
+            </div>
           </div>
         </div>
 
@@ -298,24 +296,24 @@ export default function WindowsGuide() {
             <button className="text-xs text-gray-500 hover:text-green-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300 whitespace-pre-wrap break-words">
-<span className="text-gray-600">{t('# Порты', '# Ports')}</span>
-<span className="text-purple-400">PORT</span>=<span className="text-green-400">3009</span>
-<span className="text-purple-400">WEB_PORT</span>=<span className="text-green-400">5180</span>
-<span className="text-purple-400">DATABASE_URL</span>=<span className="text-green-400">./data/aif.sqlite</span>
-
-<span className="text-gray-600">{t('# Агент', '# Agent')}</span>
-<span className="text-purple-400">AGENT_BYPASS_PERMISSIONS</span>=<span className="text-green-400">true</span>
-<span className="text-purple-400">AGENT_WAKE_ENABLED</span>=<span className="text-green-400">false</span>   <span className="text-gray-600">{t('# ВАЖНО для Windows!', '# IMPORTANT for Windows!')}</span>
-<span className="text-purple-400">POLL_INTERVAL_MS</span>=<span className="text-green-400">30000</span>
-
-<span className="text-gray-600">{t('# Авторизация (оставить пустым если используется claude login)', '# Authentication (leave empty if using claude login)')}</span>
-<span className="text-gray-600"># ANTHROPIC_API_KEY=sk-ant-xxxxx</span>
-
-<span className="text-gray-600">{t('# Логирование', '# Logging')}</span>
-<span className="text-purple-400">LOG_LEVEL</span>=<span className="text-green-400">debug</span>
-<span className="text-purple-400">AGENT_QUERY_AUDIT_ENABLED</span>=<span className="text-green-400">false</span>
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p className="text-gray-600">{t('# Порты', '# Ports')}</p>
+              <p><span className="text-purple-400">PORT</span>=<span className="text-green-400">3009</span></p>
+              <p><span className="text-purple-400">WEB_PORT</span>=<span className="text-green-400">5180</span></p>
+              <p><span className="text-purple-400">DATABASE_URL</span>=<span className="text-green-400">./data/aif.sqlite</span></p>
+              <p className="h-2" />
+              <p className="text-gray-600">{t('# Агент', '# Agent')}</p>
+              <p><span className="text-purple-400">AGENT_BYPASS_PERMISSIONS</span>=<span className="text-green-400">true</span></p>
+              <p><span className="text-purple-400">AGENT_WAKE_ENABLED</span>=<span className="text-green-400">false</span>   <span className="text-gray-600">{t('# ВАЖНО для Windows!', '# IMPORTANT for Windows!')}</span></p>
+              <p><span className="text-purple-400">POLL_INTERVAL_MS</span>=<span className="text-green-400">30000</span></p>
+              <p className="h-2" />
+              <p className="text-gray-600">{t('# Авторизация (оставить пустым если используется claude login)', '# Authentication (leave empty if using claude login)')}</p>
+              <p className="text-gray-600"># ANTHROPIC_API_KEY=sk-ant-xxxxx</p>
+              <p className="h-2" />
+              <p className="text-gray-600">{t('# Логирование', '# Logging')}</p>
+              <p><span className="text-purple-400">LOG_LEVEL</span>=<span className="text-green-400">debug</span></p>
+              <p><span className="text-purple-400">AGENT_QUERY_AUDIT_ENABLED</span>=<span className="text-green-400">false</span></p>
+            </div>
           </div>
         </div>
       </section>
@@ -336,9 +334,9 @@ export default function WindowsGuide() {
             <button className="text-xs text-gray-500 hover:text-green-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300">
-<span className="text-green-400">PS C:\aif-handoff&gt;</span> npm run dev
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-green-400">PS C:\aif-handoff&gt;</span> npm run dev</p>
+            </div>
           </div>
         </div>
 
@@ -378,12 +376,12 @@ export default function WindowsGuide() {
             <span className="text-xs text-gray-500 uppercase tracking-wide">log</span>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-xs">
-            <pre className="text-gray-300 whitespace-pre-wrap break-words">
-<span className="text-amber-400">@aif/web:dev:</span>   <span className="text-green-400">➜  Local:   http://localhost:5180/</span>
-<span className="text-amber-400">@aif/api:dev:</span>   <span className="text-green-400">{`{"msg":"API server started","port":3009}`}</span>
-<span className="text-amber-400">@aif/agent:dev:</span> <span className="text-green-400">{`{"msg":"Agent coordinator is running"}`}</span>
-<span className="text-amber-400">@aif/agent:dev:</span> <span className="text-green-400">{`{"msg":"Poll cycle complete"}`}</span>  <span className="text-gray-600">{t('← каждые 30 сек', '← every 30 seconds')}</span>
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-amber-400">@aif/web:dev:</span>   <span className="text-green-400">➜  Local:   http://localhost:5180/</span></p>
+              <p><span className="text-amber-400">@aif/api:dev:</span>   <span className="text-green-400">{`{"msg":"API server started","port":3009}`}</span></p>
+              <p><span className="text-amber-400">@aif/agent:dev:</span> <span className="text-green-400">{`{"msg":"Agent coordinator is running"}`}</span></p>
+              <p><span className="text-amber-400">@aif/agent:dev:</span> <span className="text-green-400">{`{"msg":"Poll cycle complete"}`}</span>  <span className="text-gray-600">{t('← каждые 30 сек', '← every 30 seconds')}</span></p>
+            </div>
           </div>
         </div>
       </section>

@@ -77,11 +77,11 @@ export default function DevcontainerGuide() {
             <span className="text-xs text-gray-500 uppercase tracking-wide">tree</span>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300">
-<span className="text-green-400">aif-handoff/</span>
-└── <span className="text-purple-400">.devcontainer/</span>
-    └── <span className="text-amber-400">devcontainer.json</span>   <span className="text-gray-600">{t('# конфигурация контейнера', '# container configuration')}</span>
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p className="text-green-400">aif-handoff/</p>
+              <p>└── <span className="text-purple-400">.devcontainer/</span></p>
+              <p>    └── <span className="text-amber-400">devcontainer.json</span>   <span className="text-gray-600">{t('# конфигурация контейнера', '# container configuration')}</span></p>
+            </div>
           </div>
         </div>
       </section>
@@ -143,10 +143,10 @@ export default function DevcontainerGuide() {
             <button className="text-xs text-gray-500 hover:text-purple-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300">
-<span className="text-purple-400">$</span> git clone https://github.com/lee-to/aif-handoff.git
-<span className="text-purple-400">$</span> cd aif-handoff
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-purple-400">$</span> git clone https://github.com/lee-to/aif-handoff.git</p>
+              <p><span className="text-purple-400">$</span> cd aif-handoff</p>
+            </div>
           </div>
         </div>
 
@@ -192,9 +192,9 @@ export default function DevcontainerGuide() {
             <button className="text-xs text-gray-500 hover:text-purple-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300">
-<span className="text-purple-400">$</span> code --install-extension ms-vscode-remote.remote-containers
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-purple-400">$</span> code --install-extension ms-vscode-remote.remote-containers</p>
+            </div>
           </div>
         </div>
       </section>
@@ -239,13 +239,13 @@ export default function DevcontainerGuide() {
             <span className="text-xs text-gray-500 uppercase tracking-wide">vs code — command palette</span>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300">
-<span className="text-gray-600">{t('# Открыть Command Palette', '# Open the Command Palette')}</span>
-<span className="text-amber-400">Ctrl+Shift+P</span>  <span className="text-gray-600">{t('(или Cmd+Shift+P на macOS)', '(or Cmd+Shift+P on macOS)')}</span>
-
-<span className="text-gray-600">{t('# Ввести команду', '# Type the command')}</span>
-<span className="text-purple-400">Dev Containers: Reopen in Container</span>
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p className="text-gray-600">{t('# Открыть Command Palette', '# Open the Command Palette')}</p>
+              <p><span className="text-amber-400">Ctrl+Shift+P</span>  <span className="text-gray-600">{t('(или Cmd+Shift+P на macOS)', '(or Cmd+Shift+P on macOS)')}</span></p>
+              <p className="h-2" />
+              <p className="text-gray-600">{t('# Ввести команду', '# Type the command')}</p>
+              <p className="text-purple-400">Dev Containers: Reopen in Container</p>
+            </div>
           </div>
         </div>
 
@@ -344,9 +344,9 @@ export default function DevcontainerGuide() {
             <button className="text-xs text-gray-500 hover:text-purple-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300">
-<span className="text-purple-400">$</span> cp .env.example .env
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-purple-400">$</span> cp .env.example .env</p>
+            </div>
           </div>
         </div>
 
@@ -356,9 +356,9 @@ export default function DevcontainerGuide() {
             <button className="text-xs text-gray-500 hover:text-purple-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300">
-<span className="text-purple-400">ANTHROPIC_API_KEY</span>=<span className="text-green-400">sk-ant-xxxxx</span>
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-purple-400">ANTHROPIC_API_KEY</span>=<span className="text-green-400">sk-ant-xxxxx</span></p>
+            </div>
           </div>
         </div>
 
@@ -372,9 +372,9 @@ export default function DevcontainerGuide() {
             <button className="text-xs text-gray-500 hover:text-purple-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300">
-<span className="text-purple-400">$</span> claude login
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-purple-400">$</span> claude login</p>
+            </div>
           </div>
         </div>
 
@@ -399,9 +399,9 @@ export default function DevcontainerGuide() {
             <button className="text-xs text-gray-500 hover:text-purple-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300">
-<span className="text-purple-400">$</span> cp .env.example .env
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-purple-400">$</span> cp .env.example .env</p>
+            </div>
           </div>
         </div>
 

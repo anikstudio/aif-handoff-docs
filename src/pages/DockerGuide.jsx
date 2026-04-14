@@ -94,10 +94,10 @@ export default function DockerGuide() {
             <button className="text-xs text-gray-500 hover:text-cyan-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300 whitespace-pre-wrap break-words">
-<span className="text-cyan-400">$</span> git clone https://github.com/lee-to/aif-handoff.git
-<span className="text-cyan-400">$</span> cd aif-handoff
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-cyan-400">$</span> git clone https://github.com/lee-to/aif-handoff.git</p>
+              <p><span className="text-cyan-400">$</span> cd aif-handoff</p>
+            </div>
           </div>
         </div>
 
@@ -108,17 +108,17 @@ export default function DockerGuide() {
             <span className="text-xs text-gray-500 uppercase tracking-wide">tree</span>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300 whitespace-pre-wrap break-words">
-<span className="text-green-400">aif-handoff/</span>
-├── <span className="text-blue-400">packages/</span>
-│   ├── <span className="text-purple-400">api/</span>        <span className="text-gray-600"># Hono REST + WebSocket  → :3009</span>
-│   ├── <span className="text-purple-400">web/</span>        <span className="text-gray-600"># React Kanban UI        → :5180</span>
-│   └── <span className="text-purple-400">agent/</span>      <span className="text-gray-600">{t('# Координатор субагентов', '# Subagent coordinator')}</span>
-├── <span className="text-amber-400">docker-compose.yml</span>             <span className="text-gray-600">{t('# dev режим', '# dev mode')}</span>
-├── <span className="text-amber-400">docker-compose.production.yml</span>  <span className="text-gray-600"># production</span>
-├── <span className="text-amber-400">.env.example</span>
-└── <span className="text-amber-400">package.json</span>
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p className="text-green-400">aif-handoff/</p>
+              <p>├── <span className="text-blue-400">packages/</span></p>
+              <p>│   ├── <span className="text-purple-400">api/</span>        <span className="text-gray-600"># Hono REST + WebSocket  → :3009</span></p>
+              <p>│   ├── <span className="text-purple-400">web/</span>        <span className="text-gray-600"># React Kanban UI        → :5180</span></p>
+              <p>│   └── <span className="text-purple-400">agent/</span>      <span className="text-gray-600">{t('# Координатор субагентов', '# Subagent coordinator')}</span></p>
+              <p>├── <span className="text-amber-400">docker-compose.yml</span>             <span className="text-gray-600">{t('# dev режим', '# dev mode')}</span></p>
+              <p>├── <span className="text-amber-400">docker-compose.production.yml</span>  <span className="text-gray-600"># production</span></p>
+              <p>├── <span className="text-amber-400">.env.example</span></p>
+              <p>└── <span className="text-amber-400">package.json</span></p>
+            </div>
           </div>
         </div>
       </section>
@@ -139,9 +139,9 @@ export default function DockerGuide() {
             <button className="text-xs text-gray-500 hover:text-cyan-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300 whitespace-pre-wrap break-words">
-<span className="text-cyan-400">$</span> docker compose up --build
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-cyan-400">$</span> docker compose up --build</p>
+            </div>
           </div>
         </div>
 
@@ -187,10 +187,10 @@ export default function DockerGuide() {
             <button className="text-xs text-gray-500 hover:text-cyan-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300 whitespace-pre-wrap break-words">
-<span className="text-cyan-400">$</span> docker compose up --build -d   <span className="text-gray-600">{t('# -d = detached (фон)', '# -d = detached (background)')}</span>
-<span className="text-cyan-400">$</span> docker compose logs -f          <span className="text-gray-600">{t('# просмотр логов', '# view logs')}</span>
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-cyan-400">$</span> docker compose up --build -d   <span className="text-gray-600">{t('# -d = detached (фон)', '# -d = detached (background)')}</span></p>
+              <p><span className="text-cyan-400">$</span> docker compose logs -f          <span className="text-gray-600">{t('# просмотр логов', '# view logs')}</span></p>
+            </div>
           </div>
         </div>
       </section>
@@ -240,9 +240,9 @@ export default function DockerGuide() {
             <button className="text-xs text-gray-500 hover:text-cyan-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300">
-<span className="text-cyan-400">$</span> cp .env.example .env
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-cyan-400">$</span> cp .env.example .env</p>
+            </div>
           </div>
         </div>
 
@@ -252,9 +252,9 @@ export default function DockerGuide() {
             <button className="text-xs text-gray-500 hover:text-cyan-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300">
-<span className="text-purple-400">ANTHROPIC_API_KEY</span>=<span className="text-green-400">sk-ant-xxxxx</span>
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-purple-400">ANTHROPIC_API_KEY</span>=<span className="text-green-400">sk-ant-xxxxx</span></p>
+            </div>
           </div>
         </div>
 
@@ -374,22 +374,22 @@ export default function DockerGuide() {
             <button className="text-xs text-gray-500 hover:text-cyan-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300 whitespace-pre-wrap break-words">
-<span className="text-gray-600">{t('# Авторизация (один из вариантов)', '# Authentication (pick one)')}</span>
-<span className="text-gray-600"># ANTHROPIC_API_KEY=sk-ant-xxxxx</span>
-
-<span className="text-gray-600">{t('# Порты', '# Ports')}</span>
-<span className="text-purple-400">PORT</span>=<span className="text-green-400">3009</span>
-<span className="text-purple-400">WEB_PORT</span>=<span className="text-green-400">5180</span>
-
-<span className="text-gray-600">{t('# Проекты — путь к вашему коду на хосте', '# Projects — path to your code on the host')}</span>
-<span className="text-purple-400">PROJECTS_DIR</span>=<span className="text-green-400">./projects</span>
-<span className="text-purple-400">PROJECTS_MOUNT</span>=<span className="text-green-400">/home/www</span>
-
-<span className="text-gray-600">{t('# Агент', '# Agent')}</span>
-<span className="text-purple-400">AGENT_BYPASS_PERMISSIONS</span>=<span className="text-green-400">true</span>
-<span className="text-purple-400">POLL_INTERVAL_MS</span>=<span className="text-green-400">30000</span>
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p className="text-gray-600">{t('# Авторизация (один из вариантов)', '# Authentication (pick one)')}</p>
+              <p className="text-gray-600"># ANTHROPIC_API_KEY=sk-ant-xxxxx</p>
+              <p className="h-2" />
+              <p className="text-gray-600">{t('# Порты', '# Ports')}</p>
+              <p><span className="text-purple-400">PORT</span>=<span className="text-green-400">3009</span></p>
+              <p><span className="text-purple-400">WEB_PORT</span>=<span className="text-green-400">5180</span></p>
+              <p className="h-2" />
+              <p className="text-gray-600">{t('# Проекты — путь к вашему коду на хосте', '# Projects — path to your code on the host')}</p>
+              <p><span className="text-purple-400">PROJECTS_DIR</span>=<span className="text-green-400">./projects</span></p>
+              <p><span className="text-purple-400">PROJECTS_MOUNT</span>=<span className="text-green-400">/home/www</span></p>
+              <p className="h-2" />
+              <p className="text-gray-600">{t('# Агент', '# Agent')}</p>
+              <p><span className="text-purple-400">AGENT_BYPASS_PERMISSIONS</span>=<span className="text-green-400">true</span></p>
+              <p><span className="text-purple-400">POLL_INTERVAL_MS</span>=<span className="text-green-400">30000</span></p>
+            </div>
           </div>
         </div>
       </section>
@@ -493,9 +493,9 @@ export default function DockerGuide() {
             <button className="text-xs text-gray-500 hover:text-cyan-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300">
-<span className="text-cyan-400">$</span> docker compose -f docker-compose.production.yml up --build
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-cyan-400">$</span> docker compose -f docker-compose.production.yml up --build</p>
+            </div>
           </div>
         </div>
 
@@ -507,9 +507,9 @@ export default function DockerGuide() {
             <button className="text-xs text-gray-500 hover:text-cyan-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300">
-<span className="text-cyan-400">$</span> docker compose -f docker-compose.production.yml up --build -d
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p><span className="text-cyan-400">$</span> docker compose -f docker-compose.production.yml up --build -d</p>
+            </div>
           </div>
         </div>
       </section>
@@ -560,25 +560,25 @@ export default function DockerGuide() {
             <button className="text-xs text-gray-500 hover:text-cyan-400 border border-gray-600 px-3 py-1 rounded transition">copy</button>
           </div>
           <div className="p-4 overflow-x-auto font-mono text-sm">
-            <pre className="text-gray-300 whitespace-pre-wrap break-words">
-<span className="text-gray-600">{t('# Авторизация', '# Authentication')}</span>
-<span className="text-purple-400">ANTHROPIC_API_KEY</span>=<span className="text-green-400">sk-ant-xxxxx</span>   <span className="text-gray-600">{t('# или оставить пустым + claude login', '# or leave empty and use claude login')}</span>
-
-<span className="text-gray-600">{t('# Домен и SSL', '# Domain and SSL')}</span>
-<span className="text-purple-400">DOMAIN</span>=<span className="text-green-400">handoff.example.com</span>
-
-<span className="text-gray-600">{t('# Production порты', '# Production ports')}</span>
-<span className="text-purple-400">HTTP_PORT</span>=<span className="text-green-400">80</span>
-<span className="text-purple-400">HTTPS_PORT</span>=<span className="text-green-400">443</span>
-
-<span className="text-gray-600">{t('# Проекты', '# Projects')}</span>
-<span className="text-purple-400">PROJECTS_DIR</span>=<span className="text-green-400">/var/projects</span>
-<span className="text-purple-400">PROJECTS_MOUNT</span>=<span className="text-green-400">/home/www</span>
-
-<span className="text-gray-600">{t('# Агент', '# Agent')}</span>
-<span className="text-purple-400">AGENT_BYPASS_PERMISSIONS</span>=<span className="text-green-400">true</span>
-<span className="text-purple-400">LOG_LEVEL</span>=<span className="text-green-400">info</span>   <span className="text-gray-600">{t('# в production лучше info вместо debug', '# prefer info over debug in production')}</span>
-            </pre>
+            <div className="text-gray-300 space-y-1 break-words">
+              <p className="text-gray-600">{t('# Авторизация', '# Authentication')}</p>
+              <p><span className="text-purple-400">ANTHROPIC_API_KEY</span>=<span className="text-green-400">sk-ant-xxxxx</span>   <span className="text-gray-600">{t('# или оставить пустым + claude login', '# or leave empty and use claude login')}</span></p>
+              <p className="h-2" />
+              <p className="text-gray-600">{t('# Домен и SSL', '# Domain and SSL')}</p>
+              <p><span className="text-purple-400">DOMAIN</span>=<span className="text-green-400">handoff.example.com</span></p>
+              <p className="h-2" />
+              <p className="text-gray-600">{t('# Production порты', '# Production ports')}</p>
+              <p><span className="text-purple-400">HTTP_PORT</span>=<span className="text-green-400">80</span></p>
+              <p><span className="text-purple-400">HTTPS_PORT</span>=<span className="text-green-400">443</span></p>
+              <p className="h-2" />
+              <p className="text-gray-600">{t('# Проекты', '# Projects')}</p>
+              <p><span className="text-purple-400">PROJECTS_DIR</span>=<span className="text-green-400">/var/projects</span></p>
+              <p><span className="text-purple-400">PROJECTS_MOUNT</span>=<span className="text-green-400">/home/www</span></p>
+              <p className="h-2" />
+              <p className="text-gray-600">{t('# Агент', '# Agent')}</p>
+              <p><span className="text-purple-400">AGENT_BYPASS_PERMISSIONS</span>=<span className="text-green-400">true</span></p>
+              <p><span className="text-purple-400">LOG_LEVEL</span>=<span className="text-green-400">info</span>   <span className="text-gray-600">{t('# в production лучше info вместо debug', '# prefer info over debug in production')}</span></p>
+            </div>
           </div>
         </div>
       </section>
